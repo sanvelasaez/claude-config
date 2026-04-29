@@ -1,0 +1,38 @@
+{
+  "_descripcion": "Template de permisos y hooks para un proyecto. Copiar a .claude/settings.json en la raíz del proyecto y ajustar según el stack. Extiende ~/.claude/settings.json — nunca elimina ni contradice los deny globales.",
+  "permissions": {
+    "allow": [
+      "Write(src/**)",
+      "Write(tests/**)",
+      "Write(docs/**)",
+      "Write(.claude/**)",
+      "Bash(npm install)",
+      "Bash(npm run *)",
+      "Bash(npx *)"
+    ],
+    "deny": [
+      "Write(src/generated/**)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "_comentario": "Ejemplo: ejecutar lint después de cada escritura en src/. Ajustar el comando al linter del proyecto.",
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Hook PostToolUse Write — añadir aquí el comando de lint/format del proyecto'"
+          }
+        ]
+      }
+    ]
+  },
+  "_instrucciones": [
+    "1. Renombrar o eliminar las claves que empiezan por '_' — son solo documentación",
+    "2. Ajustar la lista 'allow' según los comandos que usa el stack del proyecto",
+    "3. Añadir en 'deny' las rutas que no se deben modificar (auto-generados, legacy, etc.)",
+    "4. Sustituir el hook de ejemplo por el linter/formatter real del proyecto",
+    "5. Si el flujo Git está activo, añadir: Bash(git add*), Bash(git commit*), Bash(git checkout*), Bash(git switch*)"
+  ]
+}

@@ -101,17 +101,15 @@ Archivos de referencia (copiar y mantener junto a este archivo, activar por proy
 
 ### Activación de archivos de flujo opcionales
 
-Los archivos como `git-workflow.md` son **inactivos por defecto**. Para activarlos en un proyecto:
+Los archivos como `git-workflow.md` son **inactivos por defecto**. Para activar un flujo en un proyecto, añadir esta línea al `.claude/CLAUDE.md` del proyecto:
 
 ```markdown
-# En .claude/CLAUDE.md del proyecto, añadir:
-
-## Flujos activos en este proyecto
-- Git workflow activado → instrucciones completas en: git-workflow.md
-  Permisos Git adicionales habilitados en .claude/settings.json: [listar cuáles]
+@~/.claude/git-workflow.md
 ```
 
-Al activar un flujo opcional, verificar que los permisos necesarios están en `.claude/settings.json` del proyecto y que no colisionan con los `deny` globales.
+Esta sintaxis importa el archivo directamente en el contexto del proyecto. Claude lo leerá y aplicará sus instrucciones en esa sesión.
+
+Además, añadir los permisos necesarios en `.claude/settings.json` del proyecto (ver plantilla en `templates/project-settings.json`). Verificar que no colisionan con los `deny` del settings global.
 
 ---
 
@@ -120,60 +118,78 @@ Al activar un flujo opcional, verificar que los permisos necesarios están en `.
 > ⚠️ **Estado inicial:** En una instalación nueva no hay skills configuradas.  
 > El primer paso al iniciar Claude Code en un entorno nuevo es configurar las skills.
 
-### Proceso de configuración de skills (ejecutar en instalación nueva)
+### Guía de instalación completa (ejecutar en instalación nueva)
 
+**Paso 0 — Copiar los archivos base del repositorio**
+Clonar o copiar el contenido de este repositorio a `~/.claude/`:
+```bash
+cp -r skills/ ~/.claude/skills/
+cp -r agents/ ~/.claude/agents/
+cp settings.json ~/.claude/settings.json
+cp git-workflow.md ~/.claude/git-workflow.md
+cp SKILL-REGISTRY.md ~/.claude/SKILL-REGISTRY.md
 ```
-0. CREAR PRIMERO las dos skills de prioridad máxima
-   → external-source-auditor (seguridad de fuentes externas) — definición más abajo
-   → skill-finder (búsqueda de skills) — definición más abajo
-   → Estas dos skills deben existir ANTES de instalar o buscar cualquier otra cosa
+> Si algún archivo ya existe, **no sobreescribirlo**. Revisar las diferencias primero.
 
-1. EXPLORAR skills externas disponibles (con skill-finder)
-   → Ejecutar /plugin para ver el marketplace oficial
-   → Revisar skills de la comunidad relevantes al tipo de proyecto habitual
+**Paso 1 — Verificar las dos skills de prioridad máxima**
+Confirmar que existen en `~/.claude/skills/`:
+- `external-source-auditor.md` — auditoría de fuentes externas
+- `skill-finder.md` — búsqueda de skills
 
-2. AUDITAR e INSTALAR skills externas (con external-source-auditor)
-   → Pasar cada candidata por external-source-auditor antes de instalar
-   → Instalar solo las que pasen la auditoría: /plugin install <nombre>
+Estas dos deben existir antes de instalar o buscar cualquier otra cosa.
 
-3. EVALUAR qué skills personalizadas son necesarias
-   → Preguntar al usuario: ¿con qué lenguajes, frameworks y flujos trabajará?
-   → Proponer un set de skills a crear según la respuesta
+**Paso 2 — Buscar skills externas adicionales (opcional)**
+Usar `skill-finder` para buscar en fuentes externas cuando se necesite una capacidad no cubierta:
+- Buscar en GitHub con `claude-code skills <término>`
+- Consultar la documentación oficial de Anthropic (docs.anthropic.com)
+- **Siempre pasar por `external-source-auditor` antes de instalar cualquier skill externa**
 
-4. CREAR skills personalizadas
-   → Generar archivos .md en ~/.claude/skills/ (globales)
-   → O en .claude/skills/ si son específicas del proyecto
-   → Cada skill debe tener: nombre, descripción precisa (activa el trigger) y contenido
+**Paso 3 — Crear skills personalizadas si se necesitan**
+Generar archivos `.md` en `~/.claude/skills/` (globales) o `.claude/skills/` (solo para el proyecto).
+Formato obligatorio:
+```markdown
+---
+name: nombre-de-la-skill
+description: Descripción precisa que activa el trigger automático. Incluir cuándo se usa.
+---
 
-5. ACTUALIZAR este CLAUDE.md
-   → Añadir cada skill nueva a la tabla de skills
-   → Vincularla a los agentes que deben usarla (ver regla de actualización automática)
-
-6. VERIFICAR la configuración
-   → Ejecutar /skills para listar las skills cargadas
-   → Probar que el trigger automático funciona con el contexto esperado
+[Contenido de la skill: proceso, criterios, formato de salida...]
 ```
+
+**Paso 4 — Registrar y documentar**
+- Añadir la skill nueva a la tabla de skills de este CLAUDE.md
+- Actualizar `~/.claude/SKILL-REGISTRY.md` con origen y estado de seguridad
+- Si es externa: añadir el resultado de la auditoría al historial del registro
+
+**Paso 5 — Verificar la configuración**
+Iniciar una sesión de Claude Code y comprobar que:
+- Las skills se cargan (probar un contexto que debería activar el trigger)
+- Los hooks funcionan (hacer una escritura de prueba y verificar audit.log)
+- Los permisos son correctos (intentar una operación denegada para confirmar el bloqueo)
 
 ---
 
 ### Tabla de skills — estado actual
 
-Skills base independientes de lenguaje. Las dos primeras tienen prioridad absoluta:
+Skills base independientes de lenguaje. Las dos primeras tienen prioridad absoluta.
+El estado de seguridad y origen de cada skill se mantiene en `SKILL-REGISTRY.md`.
 
 | Prioridad | Skill | Descripción — trigger automático | Agente principal |
 |---|---|---|---|
-| 🔴 **1** | `external-source-auditor` | Auditar cualquier elemento de origen externo antes de instalarlo o usarlo: skills, plugins, MCP servers, dependencias, scripts, herramientas | todos |
+| 🔴 **1** | `external-source-auditor` | Auditar cualquier elemento de origen externo antes de instalarlo o usarlo: skills, MCP servers, dependencias, scripts, herramientas | todos |
 | 🔴 **2** | `skill-finder` | Buscar skills existentes cuando se necesita capacidad nueva para una tarea que ninguna skill actual cubre | sesión principal |
-| 3 | `code-review` | Revisar código en busca de bugs, problemas de seguridad y rendimiento | `@reviewer` |
-| 4 | `security-audit` | Auditar código que maneje datos sensibles, autenticación o credenciales | `@reviewer`, `@qa` |
-| 5 | `test-writer` | Escribir o completar tests para código nuevo o modificado | `@qa` |
-| 6 | `debug-tracer` | Depurar errores con análisis sistemático antes de modificar nada | `@debugger` |
-| 7 | `arch-patterns` | Seleccionar y aplicar patrones de diseño apropiados a la implementación | `@architect` |
-| 8 | `doc-writer` | Generar documentación inline o de archivo al crear o modificar código | todos |
-| 9 | `ui-design-review` | Revisar y guiar el diseño visual de interfaces frontend | `@designer` |
-| 10 | `perf-profiler` | Analizar rendimiento e identificar cuellos de botella | `@reviewer`, `@qa` |
+| 3 | `code-review` | Revisar código en busca de bugs, problemas de seguridad y rendimiento antes de considerar cualquier implementación terminada | `@reviewer` |
+| 4 | `security-audit` | Auditar código que maneje datos sensibles, autenticación, autorización o credenciales | `@reviewer`, `@qa` |
+| 5 | `test-writer` | Escribir tests para código nuevo o modificado, o cuando @qa detecta gaps de cobertura | `@qa` |
+| 6 | `debug-tracer` | Depurar errores con análisis sistemático de hipótesis cuando el origen no es obvio o el error es intermitente | `@debugger` |
+| 7 | `arch-patterns` | Seleccionar y aplicar patrones de diseño al diseñar un módulo nuevo o refactorizar estructura compleja | `@architect` |
+| 8 | `doc-writer` | Generar documentación inline o de módulo al crear o modificar APIs públicas o código con lógica no obvia | todos |
+| 9 | `ui-design-review` | Revisar contraste, tipografía, espaciado, estados de componente y accesibilidad en interfaces frontend | `@designer` |
+| 10 | `perf-profiler` | Analizar rendimiento e identificar cuellos de botella cuando hay degradación observable | `@reviewer`, `@qa` |
+| 11 | `reflection` | Analizar el historial de la sesión para detectar errores, reglas no aplicadas y patrones a sistematizar | sesión principal |
 
-> Esta tabla es la fuente de verdad del estado de skills. Se actualiza automáticamente al añadir o eliminar cualquier skill (ver regla de actualización automática).
+> Esta tabla es la fuente de verdad del estado de skills. Se actualiza al añadir o eliminar cualquier skill (ver regla de actualización automática).
+> El origen, seguridad y fechas de cada skill se registran en `SKILL-REGISTRY.md`.
 
 ---
 
@@ -586,47 +602,15 @@ Son la única capa completamente determinista de Claude Code.
 ### Hooks globales esenciales (`~/.claude/settings.json`)
 
 Solo hooks universales: bloqueo de comandos destructivos y auditoría de escrituras.
+El archivo `settings.json` de este repositorio contiene la configuración completa lista para copiar.
 
-```json
-{
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [{
-          "type": "command",
-          "command": "echo \"$CLAUDE_TOOL_INPUT\" | python3 -c \"import sys,json; cmd=json.load(sys.stdin).get('command',''); bad=['rm -rf /','rm -rf ~','DROP TABLE','DELETE FROM','format c:','mkfs','dd if=']; exit(1) if any(b in cmd for b in bad) else exit(0)\" 2>/dev/null && exit 0 || (echo '⛔ BLOQUEADO: Comando potencialmente destructivo. Confirma manualmente si es necesario.' && exit 1)"
-        }]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Write",
-        "hooks": [{
-          "type": "command",
-          "command": "echo \"[$(date '+%Y-%m-%d %H:%M:%S')] WRITE: $CLAUDE_TOOL_RESULT\" >> ~/.claude/audit.log"
-        }]
-      }
-    ],
-    "SessionStart": [
-      {
-        "hooks": [{
-          "type": "command",
-          "command": "echo \"[$(date '+%Y-%m-%d %H:%M:%S')] SESSION START — dir: $(pwd)\" >> ~/.claude/sessions.log"
-        }]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "hooks": [{
-          "type": "command",
-          "command": "echo \"[$(date '+%Y-%m-%d %H:%M:%S')] SESSION END\" >> ~/.claude/sessions.log"
-        }]
-      }
-    ]
-  }
-}
-```
+Mejoras respecto a versiones anteriores:
+- **Bloqueo destructivo**: usa un script Python multilínea más legible y robusto (no un one-liner)
+- **Auditoría de escrituras**: registra solo la ruta del archivo escrito, no el contenido (evita logs voluminosos)
+- **Logs de sesión**: usa Python para compatibilidad cross-platform (Windows/Linux/macOS)
+- **Todos los scripts**: capturan excepciones silenciosamente para no interrumpir el flujo si el log falla
+
+Ver contenido completo en `settings.json` de este repositorio.
 
 ### Hooks de proyecto (definir en `/init`)
 
@@ -743,7 +727,7 @@ Los hooks de proyecto van en .claude/settings.json, nunca en el global.
 - **Retomar sesiones:** `claude --continue` (última sesión) | `claude --resume` (elegir sesión).
 - **La exploración siempre va en `@explorer`**, nunca en la sesión principal.
 - Usar `#` para añadir instrucciones que se guardan automáticamente en CLAUDE.md durante la sesión.
-- Ejecutar `/reflection` periódicamente para auto-analizar el historial y mejorar esta configuración.
+- Activar la skill `reflection` periódicamente para auto-analizar el historial y detectar mejoras en la configuración. Funciona como contexto de trigger automático: se activa si se menciona "reflexión de sesión", "qué hemos aprendido hoy" o similar.
 
 ### Qué va dónde
 
@@ -751,10 +735,13 @@ Los hooks de proyecto van en .claude/settings.json, nunca en el global.
 |---|---|
 | `~/.claude/CLAUDE.md` | Instrucciones globales, filosofía, estándares, agentes, skills (este archivo) |
 | `~/.claude/settings.json` | Permisos globales, hooks globales |
-| `.claude/CLAUDE.md` | Contexto del proyecto: stack, arquitectura, convenciones específicas |
-| `.claude/settings.json` | Permisos del proyecto, hooks del proyecto |
+| `~/.claude/SKILL-REGISTRY.md` | Registro de skills instaladas: origen, seguridad, fechas, historial de auditorías |
+| `~/.claude/skills/` | Archivos .md de cada skill global |
+| `~/.claude/agents/` | Archivos .md de cada subagente global |
+| `~/.claude/git-workflow.md` | Flujo Git — inactivo por defecto, activar por proyecto con `@~/.claude/git-workflow.md` |
+| `.claude/CLAUDE.md` | Contexto del proyecto (copiar de `templates/project-claude.md` y rellenar) |
+| `.claude/settings.json` | Permisos y hooks del proyecto (copiar de `templates/project-settings.json` y ajustar) |
 | `.mcp.json` | MCP servers del proyecto |
-| `git-workflow.md` | Flujo Git — inactivo por defecto, activar por proyecto |
 
 ---
 
@@ -763,11 +750,12 @@ Los hooks de proyecto van en .claude/settings.json, nunca en el global.
 | Tarea | Modelo |
 |---|---|
 | Desarrollo general, features, reviews, debugging | `claude-sonnet-4-6` |
-| Exploración rápida de codebase (subagente `@explorer`) | `claude-haiku-4-5` |
+| Exploración rápida de codebase (subagente `@explorer`) | `claude-haiku-4-5-20251001` |
 
 > `claude-opus` **no está disponible** en esta configuración.  
 > `claude-sonnet-4-6` es el modelo principal para todo trabajo que requiera razonamiento o generación de código.  
-> `claude-haiku-4-5` únicamente para `@explorer`, donde la velocidad prima sobre la profundidad.
+> `claude-haiku-4-5-20251001` únicamente para `@explorer`, donde la velocidad prima sobre la profundidad.  
+> Al actualizar modelos: verificar los IDs exactos en docs.anthropic.com y actualizar también los archivos en `agents/`.
 
 ---
 
@@ -809,11 +797,12 @@ Aplicar antes de considerar cualquier implementación terminada:
 ~/.claude/
 ├── CLAUDE.md                          ← Este archivo
 ├── settings.json                      ← Permisos y hooks globales
+├── SKILL-REGISTRY.md                  ← Registro de skills: origen, seguridad, historial
 ├── sessions.log                       ← Generado por hook (SessionStart/End)
-├── audit.log                          ← Generado por hook (PostToolUse Write)
+├── audit.log                          ← Generado por hook (PostToolUse Write — ruta del archivo)
 ├── skills/
-│   ├── external-source-auditor.md    ← CREAR PRIMERO (prioridad máxima)
-│   ├── skill-finder.md               ← CREAR SEGUNDO
+│   ├── external-source-auditor.md    ← INSTALAR PRIMERO (prioridad máxima)
+│   ├── skill-finder.md               ← INSTALAR SEGUNDO
 │   ├── code-review.md
 │   ├── security-audit.md
 │   ├── test-writer.md
@@ -821,24 +810,27 @@ Aplicar antes de considerar cualquier implementación terminada:
 │   ├── arch-patterns.md
 │   ├── doc-writer.md
 │   ├── ui-design-review.md
-│   └── perf-profiler.md
-└── agents/
-    ├── explorer.md
-    ├── architect.md
-    ├── reviewer.md
-    ├── debugger.md
-    ├── qa.md
-    └── designer.md
+│   ├── perf-profiler.md
+│   └── reflection.md
+├── agents/
+│   ├── explorer.md
+│   ├── architect.md
+│   ├── reviewer.md
+│   ├── debugger.md
+│   ├── qa.md
+│   └── designer.md
+└── git-workflow.md                    ← Flujo Git opcional — activar por proyecto
 
-[Archivos de flujos opcionales — inactivos por defecto]
-├── git-workflow.md                    ← Activar por proyecto cuando se necesite
-└── [otros flujos que se vayan creando]
+[En este repositorio — plantillas para configuración de proyectos]
+templates/
+├── project-claude.md                  ← Copiar a .claude/CLAUDE.md del proyecto y rellenar
+└── project-settings.json              ← Copiar a .claude/settings.json del proyecto y ajustar
 
-[raíz de cada proyecto]/
+[Raíz de cada proyecto]
 └── .claude/
-    ├── CLAUDE.md                      ← Contexto del proyecto (extiende el global)
+    ├── CLAUDE.md                      ← Contexto del proyecto (extendido de la plantilla)
     ├── settings.json                  ← Permisos y hooks del proyecto
-    └── .mcp.json                      ← MCP servers del proyecto
+    └── .mcp.json                      ← MCP servers del proyecto (si aplica)
 ```
 
 ---

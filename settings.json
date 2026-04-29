@@ -1,0 +1,85 @@
+{
+  "_descripcion": "Configuración global de Claude Code. Copiar a ~/.claude/settings.json en cada instalación nueva.",
+  "permissions": {
+    "deny": [
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/secrets/**)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(**/.ssh/**)",
+      "Write(**/dist/**)",
+      "Write(**/build/**)",
+      "Write(**/node_modules/**)",
+      "Bash(rm -rf *)",
+      "Bash(sudo rm *)",
+      "Bash(curl * | bash)",
+      "Bash(wget * | sh)",
+      "Bash(git push*)",
+      "Bash(git commit*)",
+      "Bash(git merge*)",
+      "Bash(git rebase*)",
+      "Bash(git reset --hard*)"
+    ],
+    "allow": [
+      "Read(**)",
+      "Write(src/**)",
+      "Write(tests/**)",
+      "Write(docs/**)",
+      "Bash(npm install*)",
+      "Bash(npm run*)",
+      "Bash(npx *)",
+      "Bash(pip install*)",
+      "Bash(python *)",
+      "Bash(node *)",
+      "Bash(git status)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git branch)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"\nimport sys, json, os\ntry:\n    raw = os.environ.get('CLAUDE_TOOL_INPUT', '{}')\n    cmd = json.loads(raw).get('command', '')\n    blocked = [\n        'rm -rf /',\n        'rm -rf ~',\n        'DROP TABLE',\n        'DELETE FROM',\n        'format c:',\n        'mkfs',\n        'dd if='\n    ]\n    if any(b in cmd for b in blocked):\n        print('BLOQUEADO: Comando potencialmente destructivo detectado. Confirma manualmente si es necesario.')\n        sys.exit(1)\nexcept Exception:\n    pass\n\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"\nimport sys, json, os\nfrom datetime import datetime\ntry:\n    raw = os.environ.get('CLAUDE_TOOL_INPUT', '{}')\n    file_path = json.loads(raw).get('file_path', 'unknown')\n    log_line = f'[{datetime.now().strftime(\"%Y-%m-%d %H:%M:%S\")}] WRITE: {file_path}'\n    log_path = os.path.expanduser('~/.claude/audit.log')\n    with open(log_path, 'a', encoding='utf-8') as f:\n        f.write(log_line + '\\n')\nexcept Exception:\n    pass\n\""
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"\nimport os\nfrom datetime import datetime\ntry:\n    log_line = f'[{datetime.now().strftime(\"%Y-%m-%d %H:%M:%S\")}] SESSION START — dir: {os.getcwd()}'\n    log_path = os.path.expanduser('~/.claude/sessions.log')\n    with open(log_path, 'a', encoding='utf-8') as f:\n        f.write(log_line + '\\n')\nexcept Exception:\n    pass\n\""
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"\nimport os\nfrom datetime import datetime\ntry:\n    log_line = f'[{datetime.now().strftime(\"%Y-%m-%d %H:%M:%S\")}] SESSION END'\n    log_path = os.path.expanduser('~/.claude/sessions.log')\n    with open(log_path, 'a', encoding='utf-8') as f:\n        f.write(log_line + '\\n')\nexcept Exception:\n    pass\n\""
+          }
+        ]
+      }
+    ]
+  }
+}

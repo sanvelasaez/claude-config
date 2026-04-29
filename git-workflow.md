@@ -1,20 +1,25 @@
 # 🌿 git-workflow.md — Flujo de Trabajo con Git
-> Archivo de configuración Git para proyectos. Activar copiando a `.claude/CLAUDE.md` del proyecto  
-> o importando desde el CLAUDE.md del proyecto con: `@git-workflow.md`  
-> **No forma parte de la configuración global.** Requiere activación explícita por proyecto.
+> Flujo de trabajo Git opcional. **Inactivo por defecto.** Requiere activación explícita por proyecto.  
+> Ubicación: `~/.claude/git-workflow.md`
 
 ---
 
-## ⚙️ Activación por proyecto
+## ⚙️ Cómo activar en un proyecto
 
-Antes de habilitar el flujo Git en un proyecto, Claude debe:
+**Paso 1 — Importar el archivo en el CLAUDE.md del proyecto**
 
-1. Confirmar con el usuario que el flujo Git está configurado y se puede usar
-2. Verificar en qué rama se trabaja por defecto y cuáles están protegidas
-3. Preguntar si se trabaja con ramas de feature o directamente en la rama principal
-4. Añadir los permisos Git necesarios al proyecto (preguntar global vs. proyecto según regla de permisos)
+Añadir esta línea al `.claude/CLAUDE.md` del proyecto:
 
-**Permisos adicionales a habilitar en `.claude/settings.json` del proyecto:**
+```
+@~/.claude/git-workflow.md
+```
+
+Esto importa el archivo directamente en el contexto del proyecto. Claude leerá y aplicará las instrucciones de este flujo en esa sesión.
+
+**Paso 2 — Añadir los permisos Git en `.claude/settings.json`**
+
+Sin esta configuración, los comandos Git que modifican el repositorio seguirán bloqueados por el `deny` global:
+
 ```json
 {
   "permissions": {
@@ -28,7 +33,15 @@ Antes de habilitar el flujo Git en un proyecto, Claude debe:
 }
 ```
 
-> `git push`, `git merge`, `git rebase` y `git reset --hard` requieren confirmación explícita del usuario caso por caso. No añadirlos a los permisos permitidos salvo decisión explícita.
+> `git push`, `git merge`, `git rebase` y `git reset --hard` requieren confirmación explícita del usuario caso por caso. No añadirlos al allow salvo decisión explícita del usuario.
+
+**Paso 3 — Verificar con Claude**
+
+Antes de empezar a trabajar con Git en el proyecto, Claude debe confirmar:
+
+1. ¿En qué rama se trabaja por defecto y cuáles están protegidas?
+2. ¿Se trabaja con ramas de feature o directamente en la rama principal?
+3. ¿Hay un remote configurado? ¿Está autenticado?
 
 ---
 
