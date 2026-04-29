@@ -53,13 +53,21 @@ def contains_any(text: str, substrings: list[str]) -> str | None:
     return None
 
 
+def _safe_print(msg: str) -> None:
+    """Imprime el mensaje con fallback ASCII para entornos con encoding limitado (ej: Windows cp1252)."""
+    try:
+        print(msg, flush=True)
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        print(msg.encode("ascii", errors="replace").decode("ascii"), flush=True)
+
+
 def block(reason: str) -> None:
-    print(f"⛔ CENTINEL BLOQUEADO: {reason}", flush=True)
+    _safe_print(f"[CENTINEL] BLOQUEADO: {reason}")
     sys.exit(1)
 
 
 def warn(reason: str) -> None:
-    print(f"⚠️  CENTINEL ADVERTENCIA: {reason}", flush=True)
+    _safe_print(f"[CENTINEL] ADVERTENCIA: {reason}")
 
 
 # --- Comprobaciones por tipo de herramienta ---
