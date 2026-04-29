@@ -166,6 +166,17 @@ git push origin feature/nombre-de-la-feature
 
 ---
 
+## 🤝 FLUJO MULTI-AGENTE
+
+Cuando el flujo Git está activo en un proyecto con `agent-coordination.md`:
+
+- **Solo el orquestador (sesión principal) mergea a `develop`.** Ningún subagente mergea directamente.
+- Cada subagente trabaja en su propia rama de feature y hace push al terminar
+- El orquestador revisa el diff de la rama antes de mergear
+- Si hay conflictos entre ramas de agentes, el orquestador los resuelve; nunca un agente individual
+
+---
+
 ## 🚨 OPERACIONES DE ALTO RIESGO
 
 Las siguientes operaciones **requieren confirmación explícita del usuario** y descripción clara del impacto antes de ejecutarse:
