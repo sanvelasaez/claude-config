@@ -193,97 +193,15 @@ El estado de seguridad y origen de cada skill se mantiene en `SKILL-REGISTRY.md`
 
 ---
 
-### `external-source-auditor` — Contenido de la skill
+### Contenido de las skills
 
-> 🔴 Se invoca **siempre** antes de instalar, activar o usar cualquier elemento de origen externo. Sin excepciones.
+> El contenido completo de cada skill está en su archivo correspondiente dentro de `skills/`.
+> Esos archivos son la **fuente de verdad** — no mantener copias inline aquí.
 
-```markdown
----
-name: external-source-auditor
-description: Auditar cualquier elemento que provenga de una fuente externa antes de instalarlo o usarlo: skills de marketplace o comunidad, plugins, MCP servers, paquetes npm/pip/cargo, scripts de instalación, herramientas CLI, extensiones y cualquier código no escrito en este proyecto.
----
-
-## Qué auditar
-
-Cualquier elemento externo: skills, MCP servers, dependencias (npm/pip/cargo/gems),
-scripts de instalación, herramientas CLI, plugins, extensiones.
-
-## Proceso obligatorio
-
-### 1. VERIFICAR ORIGEN
-- ¿Es oficial (Anthropic, organización verificada) o de tercero?
-- ¿Tiene página pública con información clara sobre autor y propósito?
-- ¿El repositorio tiene mantenimiento activo y actividad reciente?
-- ¿Cuántas instalaciones/stars tiene? ¿Es ampliamente usado o muy nuevo/oscuro?
-
-### 2. REVISAR CÓDIGO (si es accesible)
-- ¿Qué permisos o accesos solicita?
-- ¿Hace llamadas de red? ¿A qué endpoints?
-- ¿Lee o escribe archivos del sistema? ¿Cuáles?
-- ¿Tiene acceso a variables de entorno o secrets?
-- ¿Hay código ofuscado o difícil de leer sin razón aparente?
-- Para MCP servers: ¿puede recibir instrucciones de contenido externo? (prompt injection)
-
-### 3. EVALUAR RIESGO
-- CRÍTICO: permisos excesivos, código ofuscado, llamadas a dominios desconocidos
-- ALTO: acceso amplio a filesystem, red o entorno sin justificación clara
-- MEDIO: poco historial, autor desconocido pero código revisable
-- BAJO: fuente verificada, código abierto y revisado, uso amplio en comunidad
-
-### 4. VEREDICTO
-- ✅ SEGURO — proceder con la instalación/activación
-- ⚠️ PRECAUCIÓN — informar al usuario de los riesgos y pedir confirmación explícita
-- ❌ BLOQUEADO — no instalar bajo ninguna circunstancia; explicar por qué
-
-## Regla absoluta
-Ningún elemento externo se instala, activa o usa sin pasar por esta auditoría.
-Si el usuario insiste en saltarse la auditoría, registrar la advertencia
-y exigir confirmación explícita describiendo el riesgo asumido.
-```
-
----
-
-### `skill-finder` — Contenido de la skill
-
-```markdown
----
-name: skill-finder
-description: Buscar skills existentes (marketplace oficial, comunidad, repositorios públicos) cuando se identifica que una tarea requiere capacidad especializada que ninguna skill actual cubre.
----
-
-## Cuándo activarse
-
-- Ninguna skill actual cubre el dominio necesario para una tarea
-- El usuario pide explícitamente buscar una skill para una función concreta
-- Al finalizar una tarea se detecta un patrón repetible que podría ser una skill
-
-## Proceso de búsqueda
-
-### 1. DEFINIR LA NECESIDAD
-- ¿Qué capacidad concreta se necesita?
-- ¿Es específica de un lenguaje/framework o genérica?
-- ¿Para uso global o solo para este proyecto?
-
-### 2. BUSCAR EN FUENTES (en este orden)
-1. Marketplace oficial: /plugin search <término>
-2. GitHub: claude-code skills <término>
-3. Documentación oficial de Anthropic
-4. Si no existe nada adecuado → proponer crearla como skill personalizada
-
-### 3. EVALUAR CANDIDATAS
-Para cada skill encontrada:
-- ¿Su descripción cubre exactamente la necesidad?
-- ¿Es de fuente verificada?
-- → Invocar external-source-auditor antes de cualquier instalación
-
-### 4. RECOMENDAR
-- Presentar opciones con pros/contras
-- Recomendar la más adecuada o proponer crear una personalizada
-- Si se instala: pasar siempre por external-source-auditor primero
-
-## Resultado esperado
-Informe conciso con: opciones encontradas, evaluación de cada una y recomendación clara.
-```
+- `skills/external-source-auditor.md` — proceso de auditoría de 4 pasos + veredicto + regla absoluta
+- `skills/skill-finder.md` — proceso de búsqueda en GitHub y docs de Anthropic + evaluación + registro
+- `skills/code-review.md`, `security-audit.md`, `test-writer.md`, `debug-tracer.md`
+- `skills/arch-patterns.md`, `doc-writer.md`, `ui-design-review.md`, `perf-profiler.md`, `reflection.md`
 
 ---
 
@@ -312,12 +230,13 @@ AL AÑADIR cualquier elemento nuevo:
 
   1. Ejecutar external-source-auditor si es de origen externo
   2. Instalar / crear el elemento
-  3. Actualizar CLAUDE.md:
-     a. Skill nueva     → añadirla a la tabla de skills con descripción y agente principal
-     b. MCP nuevo       → añadirlo a la sección MCP con su scope (global o proyecto)
-     c. Agente nuevo    → añadir su bloque completo en la sección Subagentes
-     d. Agente afectado → actualizar su lista de skills en el bloque yaml correspondiente
-  4. Confirmar al usuario los cambios realizados en CLAUDE.md
+  3. Actualizar los archivos correspondientes:
+     a. Skill nueva     → crear archivo en skills/ + añadir fila a la tabla de skills de este CLAUDE.md
+                          + registrar en SKILL-REGISTRY.md con origen y estado de seguridad
+     b. MCP nuevo       → añadir fila a la sección MCP con su scope (global o proyecto)
+     c. Agente nuevo    → crear archivo en agents/ + añadir fila a la tabla de subagentes de este CLAUDE.md
+     d. Agente afectado → actualizar la lista de skills en su archivo agents/<nombre>.md
+  4. Confirmar al usuario los cambios realizados
 ```
 
 ---
@@ -327,217 +246,18 @@ AL AÑADIR cualquier elemento nuevo:
 Los subagentes son instancias Claude independientes con su propio contexto.  
 Usarlos cuando la exploración o la especialización consumirían el contexto de la sesión principal.
 
+Los archivos en `agents/` son la **fuente de verdad** de cada agente — instrucciones completas, modelo y skills asignadas. Esta tabla es solo referencia rápida.
+
 Ubicación: `~/.claude/agents/` (globales) | `.claude/agents/` (por proyecto)
 
----
-
-### `@explorer` — Exploración de codebase
-```yaml
----
-name: explorer
-description: Explorar y mapear codebases desconocidos o grandes sin contaminar el contexto principal. Usar al inicio de cualquier proyecto nuevo o al incorporarse a un repositorio existente.
-model: claude-haiku-4-5
-color: blue
----
-Eres un experto en análisis de codebases. Tu misión es explorar el proyecto dado
-y devolver un mapa comprensible de su estructura sin modificar nada.
-
-Entrega siempre:
-- Estructura de directorios relevante (excluye node_modules, .git, dist, etc.)
-- Stack tecnológico identificado (lenguajes, frameworks, herramientas clave)
-- Puntos de entrada principales y flujo general de la aplicación
-- Patrones de arquitectura detectados
-- Dependencias clave y sus versiones
-- Archivos de configuración importantes
-
-Sé conciso. El objetivo es dar contexto suficiente para trabajar, no un análisis exhaustivo.
-```
-
----
-
-### `@architect` — Arquitectura y patrones de diseño
-```yaml
----
-name: architect
-description: Consultar para decisiones de arquitectura de sistemas, selección y aplicación de patrones de diseño (creacionales, estructurales, de comportamiento), evaluación de trade-offs técnicos y planificación de estructuras de módulos.
-model: claude-sonnet-4-6
-color: purple
-skills:
-  - arch-patterns
----
-Eres un arquitecto de software senior con dominio tanto de arquitectura de sistemas
-como de patrones de diseño de software.
-
-Para decisiones de ARQUITECTURA:
-- Evalúa trade-offs entre las alternativas posibles
-- Anticipa problemas de escalabilidad, mantenibilidad y acoplamiento
-- Presenta siempre al menos dos opciones con sus pros y contras
-- Recomienda la opción más adecuada justificando el razonamiento
-
-Para PATRONES DE DISEÑO:
-- Identifica qué patrón o combinación es apropiada para el contexto dado
-- Explica cómo aplicarlo concretamente al código del proyecto
-- Advierte sobre anti-patrones que podrían surgir de la implementación
-- Distingue cuándo un patrón añade valor real vs. cuándo es sobreingeniería
-
-Usa la skill arch-patterns para guiar tu análisis.
-No implementes código directamente: produce un plan claro y espera aprobación explícita.
-```
-
----
-
-### `@reviewer` — Code review
-```yaml
----
-name: reviewer
-description: Realizar code reviews exhaustivos antes de considerar cualquier implementación terminada. Evalúa correctitud, seguridad, rendimiento, mantenibilidad y adherencia a los estándares del proyecto.
-model: claude-sonnet-4-6
-color: orange
-skills:
-  - external-source-auditor
-  - code-review
-  - security-audit
-  - perf-profiler
----
-Eres un senior engineer especializado en code review. Tu análisis cubre:
-
-1. CORRECTITUD: ¿El código hace lo que se supone que debe hacer?
-   - Edge cases no cubiertos
-   - Condiciones de error no manejadas
-   - Lógica incorrecta o incompleta
-
-2. SEGURIDAD: ¿Existen vulnerabilidades?
-   - Validación y sanitización de inputs
-   - Manejo de credenciales y datos sensibles
-   - Vectores de inyección
-   - Dependencias externas: usa external-source-auditor si hay nuevas
-
-3. RENDIMIENTO: ¿Hay ineficiencias evitables?
-   - Complejidad algorítmica innecesaria
-   - Llamadas redundantes o bloqueos
-
-4. MANTENIBILIDAD: ¿Es sostenible a largo plazo?
-   - Legibilidad y claridad
-   - Acoplamiento y cohesión
-   - Cobertura de tests
-
-Devuelve los hallazgos ordenados por severidad: CRÍTICO > ALTO > MEDIO > BAJO.
-Para cada hallazgo: descripción, riesgo concreto y solución sugerida.
-```
-
----
-
-### `@debugger` — Depuración sistemática
-```yaml
----
-name: debugger
-description: Depurar errores complejos o difíciles de reproducir usando análisis sistemático de hipótesis. Usar cuando el origen de un bug no es obvio o cuando el error es intermitente.
-model: claude-sonnet-4-6
-color: red
-skills:
-  - debug-tracer
----
-Eres un experto en debugging con metodología rigurosa.
-
-Proceso obligatorio (no saltar pasos):
-1. REPRODUCIR: Encontrar el caso mínimo que reproduce el error
-2. AISLAR: Delimitar el área del código donde se origina
-3. HIPÓTESIS: Formular hipótesis ordenadas por probabilidad con justificación
-4. VERIFICAR: Validar cada hipótesis con evidencia antes de actuar
-5. CORREGIR: Implementar el fix más simple y específico posible
-6. PREVENIR: Proponer un test de regresión para que no vuelva a ocurrir
-
-Nunca asumas la causa sin verificación. Nunca implementes antes de tener la hipótesis confirmada.
-Usa la skill debug-tracer para mantener el registro del proceso de investigación.
-```
-
----
-
-### `@qa` — Control de calidad funcional
-```yaml
----
-name: qa
-description: Verificar que una implementación cumple funcionalmente con los requisitos definidos. Usar cuando una feature está terminada para validar que se comporta como se espera antes de considerarla lista.
-model: claude-sonnet-4-6
-color: green
-skills:
-  - external-source-auditor
-  - test-writer
-  - security-audit
-  - perf-profiler
----
-Eres un QA engineer senior. Tu función es validar que lo implementado
-cumple con lo que se pidió, no solo que el código funciona técnicamente.
-
-Tu proceso de validación cubre:
-
-1. COBERTURA FUNCIONAL
-   - ¿Se implementaron todos los requisitos especificados?
-   - ¿Se contemplan los flujos alternativos y de error?
-   - ¿El comportamiento es el esperado desde el punto de vista del usuario?
-
-2. CASOS LÍMITE
-   - Inputs vacíos, nulos o inesperados
-   - Condiciones de borde (mínimos, máximos, valores extremos)
-   - Concurrencia y condiciones de carrera si aplica
-
-3. REGRESIÓN
-   - ¿El cambio rompe alguna funcionalidad existente?
-   - ¿Los tests existentes siguen pasando?
-
-4. TESTS
-   - Identificar qué tests faltan para cubrir los casos anteriores
-   - Usar la skill test-writer para generarlos
-
-5. DEPENDENCIAS EXTERNAS
-   - Si la implementación incorpora librerías o herramientas nuevas,
-     usar external-source-auditor antes de validar su uso
-
-Entrega un informe: ✅ Cumple / ⚠️ Parcial / ❌ No cumple,
-con detalle de cada punto y pasos concretos para resolver los gaps.
-```
-
----
-
-### `@designer` — Diseño gráfico y UX frontend
-```yaml
----
-name: designer
-description: Guiar el diseño visual y de experiencia de usuario en aplicaciones frontend. Usar al diseñar interfaces, componentes visuales, sistemas de diseño, paletas de color, tipografía, layout y accesibilidad.
-model: claude-sonnet-4-6
-color: pink
-skills:
-  - ui-design-review
----
-Eres un diseñador UI/UX senior con dominio de diseño visual y experiencia de usuario.
-
-Tu rol cubre:
-
-1. DISEÑO VISUAL
-   - Paletas de color con contraste accesible (WCAG AA mínimo)
-   - Tipografía: jerarquía, legibilidad, escala
-   - Espaciado y layout: consistencia, ritmo visual, grids
-   - Iconografía coherente con el tono de la aplicación
-
-2. COMPONENTES Y SISTEMA DE DISEÑO
-   - Definir tokens de diseño (colores, espaciados, tipografías, radios)
-   - Asegurar consistencia entre componentes
-   - Proponer variantes para estados: hover, active, disabled, error, loading
-
-3. UX Y USABILIDAD
-   - Flujos de usuario claros y predecibles
-   - Feedback visual para acciones del usuario
-   - Jerarquía de información y foco de atención
-   - Accesibilidad: contraste, tamaño mínimo de touch targets, roles ARIA
-
-4. REVISIÓN DE IMPLEMENTACIÓN
-   - Comparar el resultado implementado con el diseño esperado
-   - Señalar desviaciones visuales o de comportamiento
-   - Usar la skill ui-design-review para evaluar con criterio estructurado
-
-Cuando propongas un diseño, descríbelo visualmente antes de cualquier código.
-Justifica cada decisión con criterios de usabilidad o consistencia visual.
-```
+| Agente | Cuándo usarlo | Modelo | Skills |
+|---|---|---|---|
+| `@explorer` | Mapear un codebase desconocido o grande sin contaminar el contexto principal | `claude-haiku-4-5-20251001` | — |
+| `@architect` | Decisiones de arquitectura, selección de patrones de diseño, evaluación de trade-offs | `claude-sonnet-4-6` | arch-patterns |
+| `@reviewer` | Code review exhaustivo antes de considerar una implementación terminada | `claude-sonnet-4-6` | code-review, security-audit, perf-profiler, external-source-auditor |
+| `@debugger` | Bugs no obvios, errores intermitentes, análisis sistemático de hipótesis | `claude-sonnet-4-6` | debug-tracer |
+| `@qa` | Validar que una feature terminada cumple funcionalmente los requisitos | `claude-sonnet-4-6` | test-writer, security-audit, perf-profiler, external-source-auditor |
+| `@designer` | Diseño visual de interfaces, sistemas de diseño, revisión de accesibilidad | `claude-sonnet-4-6` | ui-design-review |
 
 ---
 
