@@ -60,5 +60,5 @@ La reflexión no tiene que encontrar problemas donde no los hay.
 
 ## Cómo aplicar los hallazgos
 Si se identifican cambios en CLAUDE.md: presentarlos al usuario y pedir confirmación antes de modificar.
-Si se identifica una skill nueva: seguir el proceso de skill-finder y external-source-auditor.
+Si se identifica una skill nueva: seguir el proceso de skill-finder y centinel-auditor.
 Si se identifica un hook nuevo: proponer el cambio en settings.json al usuario.

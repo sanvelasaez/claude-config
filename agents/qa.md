@@ -4,7 +4,7 @@ description: Verificar que una implementación cumple funcionalmente con los req
 model: claude-sonnet-4-6
 color: green
 skills:
-  - external-source-auditor
+  - centinel-auditor
   - test-writer
   - security-audit
   - perf-profiler
@@ -35,7 +35,7 @@ Tu proceso de validación cubre:
 
 5. DEPENDENCIAS EXTERNAS
    - Si la implementación incorpora librerías o herramientas nuevas,
-     usar external-source-auditor antes de validar su uso
+     usar centinel-auditor antes de validar su uso
 
 Entrega un informe: ✅ Cumple / ⚠️ Parcial / ❌ No cumple,
 con detalle de cada punto y pasos concretos para resolver los gaps.

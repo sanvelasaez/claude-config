@@ -16,7 +16,7 @@ description: Revisar código en busca de bugs, problemas de seguridad, rendimien
 - Manejo de credenciales y datos sensibles (¿se loggean por accidente?)
 - Vectores de inyección: SQL, command, XSS, path traversal
 - Exposición involuntaria de datos en respuestas de API
-→ Si hay nuevas dependencias externas: invocar external-source-auditor
+→ Si hay nuevas dependencias externas: invocar centinel-auditor
 
 ### 3. RENDIMIENTO
 - Complejidad algorítmica innecesaria (O(n²) donde podría ser O(n log n))

@@ -41,7 +41,7 @@ description: Auditar código que maneje datos sensibles, autenticación, autoriz
 - ¿Los IVs/nonces son únicos por operación de cifrado?
 
 ### DEPENDENCIAS
-→ Invocar external-source-auditor para cualquier dependencia nueva o actualización.
+→ Invocar centinel-auditor para cualquier dependencia nueva o actualización.
 
 ## Formato de salida
 

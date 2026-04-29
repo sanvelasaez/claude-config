@@ -13,8 +13,8 @@
 | 🟢 **VERIFICADA** | Fuente oficial (Anthropic) o tercero verificado con auditoría superada documentada |
 | 🟡 **CONFIABLE** | Tercero reconocido, código revisado públicamente, uso amplio en la comunidad |
 | 🔵 **PROPIA** | Creación interna, sin dependencias externas, código 100% bajo control |
-| 🔴 **BLOQUEADA** | No usar — riesgo identificado en auditoría de external-source-auditor |
-| ⚪ **PENDIENTE** | Pendiente de auditoría con external-source-auditor |
+| 🔴 **BLOQUEADA** | No usar — riesgo identificado en auditoría de centinel-auditor |
+| ⚪ **PENDIENTE** | Pendiente de auditoría con centinel-auditor |
 
 ---
 
@@ -22,7 +22,7 @@
 
 | Nombre | Origen | Seguridad | Versión/Fecha | Notas |
 |---|---|---|---|---|
-| `external-source-auditor` | Creación propia | 🔵 PROPIA | 2026-04 | Skill de seguridad base — prioridad máxima |
+| `centinel-auditor` | Creación propia | 🔵 PROPIA | 2026-04 | Skill de seguridad base — prioridad máxima. Enriquecida con IOCs de MCP Sentinel |
 | `skill-finder` | Creación propia | 🔵 PROPIA | 2026-04 | Búsqueda de skills — prioridad máxima |
 | `code-review` | Creación propia | 🔵 PROPIA | 2026-04 | Revisión de código pre-merge |
 | `security-audit` | Creación propia | 🔵 PROPIA | 2026-04 | Auditoría OWASP y autenticación |
@@ -46,11 +46,11 @@
 
 ## Historial de auditorías de elementos externos
 
-> Cada vez que se audita un elemento externo con `external-source-auditor`, registrar aquí el resultado.
+> Cada vez que se audita un elemento externo con `centinel-auditor`, registrar aquí el resultado.
 
 | Elemento auditado | Tipo | Resultado | Fecha | Notas |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| `soy-rafa/claude-mcp-sentinel` | Repo GitHub / Hook | ⚠️ PRECAUCIÓN | 2026-04-29 | Repo legítimo con buenas intenciones; no instalado como MCP. IOC patterns extraídos e integrados en centinel_iocs.json y centinel-auditor.md |
 
 ---
 
@@ -58,7 +58,7 @@
 
 ### Al instalar una skill nueva
 
-1. Ejecutar `external-source-auditor` si es de origen externo
+1. Ejecutar `centinel-auditor` si es de origen externo
 2. Añadir una fila a la tabla "Skills activas" con todos los campos:
    - **Origen**: "Creación propia" / "Anthropic oficial" / "Tercero: [nombre del repo]"
    - **Seguridad**: el símbolo correspondiente al resultado de la auditoría
@@ -74,6 +74,6 @@
 
 ### Al actualizar una skill existente
 
-1. Si es de origen externo: repetir la auditoría con `external-source-auditor`
+1. Si es de origen externo: repetir la auditoría con `centinel-auditor`
 2. Actualizar la columna "Versión/Fecha" en la tabla
 3. Si el resultado de la auditoría cambia: actualizar el símbolo de seguridad y registrar en el historial

@@ -66,7 +66,7 @@ Archivos de referencia (copiar y mantener junto a este archivo, activar por proy
 ```
 1. Crear ~/.claude/settings.json con permisos y hooks globales base
 2. Crear ~/.claude/skills/ con las dos skills de prioridad máxima primero
-   (external-source-auditor y skill-finder, ver sección Skills)
+   (centinel-auditor y skill-finder, ver sección Skills)
 3. Crear el resto de skills base
 4. Crear ~/.claude/agents/ con los archivos de cada subagente
 5. Configurar ~/.claude.json con MCP de filesystem si se va a usar
@@ -100,7 +100,7 @@ Archivos de referencia (copiar y mantener junto a este archivo, activar por proy
 - Modificar los hooks globales de auditoría y bloqueo de comandos destructivos
 - Redefinir los modelos permitidos (opus sigue no disponible)
 - Eliminar la regla de confirmación para cambios de permisos
-- Saltarse la auditoría de `external-source-auditor` para elementos externos
+- Saltarse la auditoría de `centinel-auditor` para elementos externos
 
 ### Activación de archivos de flujo opcionales
 
@@ -136,7 +136,7 @@ cp SKILL-REGISTRY.md ~/.claude/SKILL-REGISTRY.md
 
 **Paso 1 — Verificar las dos skills de prioridad máxima**
 Confirmar que existen en `~/.claude/skills/`:
-- `external-source-auditor.md` — auditoría de fuentes externas
+- `centinel-auditor.md` — auditoría de fuentes externas
 - `skill-finder.md` — búsqueda de skills
 
 Estas dos deben existir antes de instalar o buscar cualquier otra cosa.
@@ -145,7 +145,7 @@ Estas dos deben existir antes de instalar o buscar cualquier otra cosa.
 Usar `skill-finder` para buscar en fuentes externas cuando se necesite una capacidad no cubierta:
 - Buscar en GitHub con `claude-code skills <término>`
 - Consultar la documentación oficial de Anthropic (docs.anthropic.com)
-- **Siempre pasar por `external-source-auditor` antes de instalar cualquier skill externa**
+- **Siempre pasar por `centinel-auditor` antes de instalar cualquier skill externa**
 
 **Paso 3 — Crear skills personalizadas si se necesitan**
 Generar archivos `.md` en `~/.claude/skills/` (globales) o `.claude/skills/` (solo para el proyecto).
@@ -179,7 +179,7 @@ El estado de seguridad y origen de cada skill se mantiene en `SKILL-REGISTRY.md`
 
 | Prioridad | Skill | Descripción — trigger automático | Agente principal |
 |---|---|---|---|
-| 🔴 **1** | `external-source-auditor` | Auditar cualquier elemento de origen externo antes de instalarlo o usarlo: skills, MCP servers, dependencias, scripts, herramientas | todos |
+| 🔴 **1** | `centinel-auditor` | Auditar cualquier elemento de origen externo antes de instalarlo o usarlo: skills, MCP servers, dependencias, scripts, herramientas | todos |
 | 🔴 **2** | `skill-finder` | Buscar skills existentes cuando se necesita capacidad nueva para una tarea que ninguna skill actual cubre | sesión principal |
 | 3 | `code-review` | Revisar código en busca de bugs, problemas de seguridad y rendimiento antes de considerar cualquier implementación terminada | `@reviewer` |
 | 4 | `security-audit` | Auditar código que maneje datos sensibles, autenticación, autorización o credenciales | `@reviewer`, `@qa` |
@@ -201,7 +201,7 @@ El estado de seguridad y origen de cada skill se mantiene en `SKILL-REGISTRY.md`
 > El contenido completo de cada skill está en su archivo correspondiente dentro de `skills/`.
 > Esos archivos son la **fuente de verdad** — no mantener copias inline aquí.
 
-- `skills/external-source-auditor.md` — proceso de auditoría de 4 pasos + veredicto + regla absoluta
+- `skills/centinel-auditor.md` — proceso de auditoría de 4 pasos + veredicto + regla absoluta
 - `skills/skill-finder.md` — proceso de búsqueda en GitHub y docs de Anthropic + evaluación + registro
 - `skills/code-review.md`, `security-audit.md`, `test-writer.md`, `debug-tracer.md`
 - `skills/arch-patterns.md`, `doc-writer.md`, `ui-design-review.md`, `perf-profiler.md`, `reflection.md`
@@ -219,7 +219,7 @@ ANTES de cada tarea, verificar internamente:
              → al finalizar, valorar si debería crearse una skill para este patrón
 
 SIEMPRE que algo venga de fuera del proyecto:
-  → Activar external-source-auditor antes de cualquier instalación o uso
+  → Activar centinel-auditor antes de cualquier instalación o uso
 ```
 
 ---
@@ -231,7 +231,7 @@ SIEMPRE que algo venga de fuera del proyecto:
 ```
 AL AÑADIR cualquier elemento nuevo:
 
-  1. Ejecutar external-source-auditor si es de origen externo
+  1. Ejecutar centinel-auditor si es de origen externo
   2. Instalar / crear el elemento
   3. Actualizar los archivos correspondientes:
      a. Skill nueva     → crear archivo en skills/ + añadir fila a la tabla de skills de este CLAUDE.md
@@ -257,9 +257,9 @@ Ubicación: `~/.claude/agents/` (globales) | `.claude/agents/` (por proyecto)
 |---|---|---|---|
 | `@explorer` | Mapear un codebase desconocido o grande sin contaminar el contexto principal | `claude-haiku-4-5-20251001` | — |
 | `@architect` | Decisiones de arquitectura, selección de patrones de diseño, evaluación de trade-offs | `claude-sonnet-4-6` | arch-patterns |
-| `@reviewer` | Code review exhaustivo antes de considerar una implementación terminada | `claude-sonnet-4-6` | code-review, security-audit, perf-profiler, external-source-auditor |
+| `@reviewer` | Code review exhaustivo antes de considerar una implementación terminada | `claude-sonnet-4-6` | code-review, security-audit, perf-profiler, centinel-auditor |
 | `@debugger` | Bugs no obvios, errores intermitentes, análisis sistemático de hipótesis | `claude-sonnet-4-6` | debug-tracer |
-| `@qa` | Validar que una feature terminada cumple funcionalmente los requisitos | `claude-sonnet-4-6` | test-writer, security-audit, perf-profiler, external-source-auditor |
+| `@qa` | Validar que una feature terminada cumple funcionalmente los requisitos | `claude-sonnet-4-6` | test-writer, security-audit, perf-profiler, centinel-auditor |
 | `@designer` | Diseño visual de interfaces, sistemas de diseño, revisión de accesibilidad | `claude-sonnet-4-6` | ui-design-review |
 
 ### Monitor de subagentes (sesión con más de un agente activo)
@@ -285,7 +285,7 @@ Cuando la sesión principal coordina más de un subagente simultáneamente, acti
 > ⚠️ **Principio de mínimo acceso:** Conectar únicamente los MCP servers necesarios para la sesión actual.  
 > Los MCP globales deben ser los mínimos imprescindibles. El resto se configura por proyecto.
 
-> 🔒 **Seguridad:** Todo MCP server nuevo pasa por `external-source-auditor` antes de conectarse.  
+> 🔒 **Seguridad:** Todo MCP server nuevo pasa por `centinel-auditor` antes de conectarse.  
 > Los MCP que acceden a contenido externo son vectores potenciales de prompt injection.
 
 ### MCP global (`~/.claude.json`)
@@ -503,7 +503,7 @@ Los hooks de proyecto van en .claude/settings.json, nunca en el global.
 
 Claude Code NUNCA debe:
 
-- Instalar, activar o usar cualquier elemento externo sin pasar primero por `external-source-auditor`
+- Instalar, activar o usar cualquier elemento externo sin pasar primero por `centinel-auditor`
 - Escribir secrets, tokens o API keys en código fuente o archivos versionados
 - Ejecutar comandos Git que modifiquen el repositorio sin permiso explícito de proyecto
 - Modificar archivos fuera de `src/`, `tests/` y `docs/` sin permiso específico para esa ruta
@@ -529,7 +529,7 @@ Aplicar antes de considerar cualquier implementación terminada:
 - [ ] El código sigue los estándares de nomenclatura del proyecto
 - [ ] `@reviewer` ha validado los cambios
 - [ ] `@qa` ha confirmado que cumple funcionalmente con los requisitos
-- [ ] Si se añadieron dependencias externas: `external-source-auditor` las ha auditado
+- [ ] Si se añadieron dependencias externas: `centinel-auditor` las ha auditado
 
 ---
 
@@ -543,7 +543,7 @@ Aplicar antes de considerar cualquier implementación terminada:
 ├── sessions.log                       ← Generado por hook (SessionStart/End)
 ├── audit.log                          ← Generado por hook (PostToolUse Write — ruta del archivo)
 ├── skills/
-│   ├── external-source-auditor.md    ← INSTALAR PRIMERO (prioridad máxima)
+│   ├── centinel-auditor.md    ← INSTALAR PRIMERO (prioridad máxima)
 │   ├── skill-finder.md               ← INSTALAR SEGUNDO
 │   ├── code-review.md
 │   ├── security-audit.md

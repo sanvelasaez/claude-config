@@ -45,7 +45,34 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 -c \"\nimport sys, json, os\ntry:\n    raw = os.environ.get('CLAUDE_TOOL_INPUT', '{}')\n    cmd = json.loads(raw).get('command', '')\n    blocked = [\n        'rm -rf /',\n        'rm -rf ~',\n        'DROP TABLE',\n        'DELETE FROM',\n        'format c:',\n        'mkfs',\n        'dd if='\n    ]\n    if any(b in cmd for b in blocked):\n        print('BLOQUEADO: Comando potencialmente destructivo detectado. Confirma manualmente si es necesario.')\n        sys.exit(1)\nexcept Exception:\n    pass\n\""
+            "command": "python3 ~/.claude/hooks/centinel_preflight.py"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/centinel_preflight.py"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/centinel_preflight.py"
+          }
+        ]
+      },
+      {
+        "matcher": "WebFetch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/centinel_preflight.py"
           }
         ]
       }

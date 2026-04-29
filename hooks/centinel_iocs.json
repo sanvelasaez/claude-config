@@ -1,0 +1,286 @@
+{
+  "_version": "1.0.0",
+  "_description": "Base de IOCs (Indicators of Compromise) para centinel_preflight.py. Actualizar periódicamente.",
+  "_updated": "2026-04-29",
+
+  "sensitive_paths": {
+    "exact": [
+      "~/.ssh/id_rsa",
+      "~/.ssh/id_ed25519",
+      "~/.ssh/id_ecdsa",
+      "~/.aws/credentials",
+      "~/.aws/config",
+      "~/.docker/config.json",
+      "~/.kube/config",
+      "~/.gnupg",
+      "~/.netrc",
+      "~/.npmrc",
+      "~/.pypirc",
+      "~/.gitconfig",
+      "/etc/passwd",
+      "/etc/shadow",
+      "/etc/sudoers",
+      "/proc/self/environ",
+      "C:/Users",
+      "C:/Windows/System32"
+    ],
+    "patterns": [
+      "\\.env$",
+      "\\.env\\.",
+      "credentials\\.json$",
+      "\\.pem$",
+      "\\.key$",
+      "\\.p12$",
+      "\\.pfx$",
+      "\\.ppk$",
+      "id_rsa",
+      "id_ed25519",
+      "secrets\\.json$",
+      "secrets\\.yaml$",
+      "secrets\\.yml$",
+      "\\.secret$",
+      "password\\.txt$",
+      "tokens\\.json$",
+      "auth\\.json$"
+    ]
+  },
+
+  "sensitive_env_vars": {
+    "exact": [
+      "AWS_SECRET_ACCESS_KEY",
+      "AWS_ACCESS_KEY_ID",
+      "AWS_SESSION_TOKEN",
+      "ANTHROPIC_API_KEY",
+      "OPENAI_API_KEY",
+      "GITHUB_TOKEN",
+      "GITHUB_PERSONAL_ACCESS_TOKEN",
+      "GITLAB_TOKEN",
+      "STRIPE_SECRET_KEY",
+      "STRIPE_PUBLISHABLE_KEY",
+      "DATABASE_URL",
+      "DATABASE_PASSWORD",
+      "REDIS_URL",
+      "SENDGRID_API_KEY",
+      "TWILIO_AUTH_TOKEN",
+      "SLACK_BOT_TOKEN",
+      "DISCORD_BOT_TOKEN",
+      "FIREBASE_PRIVATE_KEY",
+      "GCP_SA_KEY",
+      "AZURE_CLIENT_SECRET"
+    ],
+    "patterns": [
+      ".*_API_KEY$",
+      ".*_SECRET$",
+      ".*_SECRET_KEY$",
+      ".*_TOKEN$",
+      ".*_PASSWORD$",
+      ".*_CREDENTIALS$",
+      ".*_PRIVATE_KEY$",
+      ".*_AUTH_TOKEN$"
+    ]
+  },
+
+  "malicious_domains": {
+    "exact": [
+      "giftshop.club",
+      "evil.com",
+      "malware.com",
+      "c2.example.com"
+    ],
+    "suspicious_tlds": [
+      ".tk",
+      ".ml",
+      ".ga",
+      ".cf",
+      ".gq",
+      ".xyz",
+      ".top",
+      ".work",
+      ".click",
+      ".link",
+      ".live",
+      ".pw",
+      ".cc",
+      ".ws"
+    ]
+  },
+
+  "exfiltration_services": [
+    "pastebin.com",
+    "paste.ee",
+    "hastebin.com",
+    "webhook.site",
+    "ngrok.io",
+    "ngrok-free.app",
+    "serveo.net",
+    "transfer.sh",
+    "file.io",
+    "tmpfiles.org",
+    "0x0.st",
+    "sprunge.us",
+    "ix.io",
+    "termbin.com",
+    "requestbin.com",
+    "pipedream.net",
+    "hookbin.com",
+    "beeceptor.com",
+    "requestcatcher.com",
+    "postb.in",
+    "eoheoh.com",
+    "burpcollaborator.net"
+  ],
+
+  "dangerous_command_patterns": {
+    "pipe_to_shell": [
+      "curl.*\\|.*bash",
+      "curl.*\\|.*sh",
+      "wget.*\\|.*bash",
+      "wget.*\\|.*sh",
+      "fetch.*\\|.*bash",
+      "python.*<\\(curl",
+      "python3.*<\\(curl"
+    ],
+    "reverse_shells": [
+      "bash.*-i.*>&.*/dev/tcp",
+      "nc.*-e.*/bin",
+      "ncat.*-e.*/bin",
+      "python.*socket.*connect",
+      "python3.*socket.*connect",
+      "perl.*socket.*connect",
+      "ruby.*TCPSocket",
+      "php.*fsockopen",
+      "socat.*exec",
+      "mkfifo.*/tmp.*nc"
+    ],
+    "data_exfiltration": [
+      "base64.*\\|.*curl",
+      "base64.*\\|.*wget",
+      "xxd.*\\|.*curl",
+      "cat.*\\|.*curl.*-d",
+      "tar.*\\|.*curl",
+      "zip.*\\|.*curl"
+    ],
+    "eval_exec": [
+      "eval.*base64",
+      "eval.*\\$\\(",
+      "exec.*base64",
+      "exec.*\\$\\(",
+      "__import__.*eval",
+      "subprocess.*shell=True.*input"
+    ],
+    "persistence": [
+      "crontab.*-l.*\\|.*crontab",
+      "echo.*>>.*crontab",
+      "echo.*>>.*\\.bashrc",
+      "echo.*>>.*\\.zshrc",
+      "echo.*>>.*\\.profile",
+      "echo.*>>.*\\.bash_profile",
+      "launchctl.*load",
+      "systemctl.*enable.*--now",
+      "reg.*add.*HKLM.*Run",
+      "schtasks.*\\/create"
+    ],
+    "privilege_escalation": [
+      "chmod.*777",
+      "chmod.*4755",
+      "chown.*root",
+      "sudo.*-s",
+      "sudo.*su",
+      "pkexec"
+    ],
+    "destructive": [
+      "rm -rf /",
+      "rm -rf ~",
+      "rm -rf \\$HOME",
+      "DROP TABLE",
+      "DROP DATABASE",
+      "DELETE FROM.*WHERE.*1=1",
+      "format c:",
+      "format.*\\/q",
+      "mkfs",
+      "dd if=.*of=/dev",
+      "shred.*-uz"
+    ]
+  },
+
+  "prompt_injection_patterns": [
+    "ignore previous instructions",
+    "ignore all previous",
+    "disregard previous",
+    "forget previous instructions",
+    "your new instructions are",
+    "act as.*admin",
+    "act as.*root",
+    "you are now",
+    "pretend you are",
+    "developer mode",
+    "jailbreak",
+    "bypass safety",
+    "bypass security",
+    "DAN mode",
+    "do anything now",
+    "ignore your training",
+    "ignore your guidelines",
+    "you have no restrictions",
+    "override.*safety",
+    "disable.*filters",
+    "system prompt",
+    "SYSTEM:",
+    "ASSISTANT:",
+    "USER:",
+    "\\[INST\\]",
+    "<\\|im_start\\|>",
+    "new conversation started"
+  ],
+
+  "allowlist_domains": [
+    "api.anthropic.com",
+    "api.github.com",
+    "github.com",
+    "raw.githubusercontent.com",
+    "pypi.org",
+    "files.pythonhosted.org",
+    "registry.npmjs.org",
+    "npmjs.com",
+    "docs.anthropic.com",
+    "pub.dev",
+    "storage.googleapis.com",
+    "maven.org",
+    "repo1.maven.org",
+    "registry.hub.docker.com",
+    "crates.io",
+    "rubygems.org",
+    "packagist.org",
+    "nuget.org"
+  ],
+
+  "supply_chain_indicators": [
+    "install.sh",
+    "setup.sh",
+    "bootstrap.sh",
+    "install_dependencies.sh",
+    "postinstall",
+    "postInstall",
+    "preinstall",
+    "prepare",
+    "__mocks__",
+    "node_modules/.bin",
+    ".npmrc",
+    "FUNDING.yml"
+  ],
+
+  "mcp_risk_patterns": {
+    "excessive_permissions": [
+      "filesystem.*write.*\\*\\*",
+      "exec.*shell",
+      "spawn.*process",
+      "network.*unrestricted"
+    ],
+    "prompt_injection_vectors": [
+      "readFile.*userInput",
+      "fetch.*userUrl",
+      "execute.*userCommand",
+      "eval.*toolResult"
+    ]
+  }
+}
