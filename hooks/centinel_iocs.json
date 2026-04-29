@@ -2,7 +2,6 @@
   "_version": "1.0.0",
   "_description": "Base de IOCs (Indicators of Compromise) para centinel_preflight.py. Actualizar periódicamente.",
   "_updated": "2026-04-29",
-
   "sensitive_paths": {
     "exact": [
       "~/.ssh/id_rsa",
@@ -44,7 +43,6 @@
       "auth\\.json$"
     ]
   },
-
   "sensitive_env_vars": {
     "exact": [
       "AWS_SECRET_ACCESS_KEY",
@@ -79,7 +77,6 @@
       ".*_AUTH_TOKEN$"
     ]
   },
-
   "malicious_domains": {
     "exact": [
       "giftshop.club",
@@ -104,7 +101,6 @@
       ".ws"
     ]
   },
-
   "exfiltration_services": [
     "pastebin.com",
     "paste.ee",
@@ -129,7 +125,6 @@
     "eoheoh.com",
     "burpcollaborator.net"
   ],
-
   "dangerous_command_patterns": {
     "pipe_to_shell": [
       "curl.*\\|.*bash",
@@ -202,7 +197,6 @@
       "shred.*-uz"
     ]
   },
-
   "prompt_injection_patterns": [
     "ignore previous instructions",
     "ignore all previous",
@@ -232,7 +226,6 @@
     "<\\|im_start\\|>",
     "new conversation started"
   ],
-
   "allowlist_domains": [
     "api.anthropic.com",
     "api.github.com",
@@ -253,7 +246,6 @@
     "packagist.org",
     "nuget.org"
   ],
-
   "supply_chain_indicators": [
     "install.sh",
     "setup.sh",
@@ -268,7 +260,6 @@
     ".npmrc",
     "FUNDING.yml"
   ],
-
   "mcp_risk_patterns": {
     "excessive_permissions": [
       "filesystem.*write.*\\*\\*",
@@ -282,5 +273,6 @@
       "execute.*userCommand",
       "eval.*toolResult"
     ]
-  }
+  },
+  "_version_history": []
 }

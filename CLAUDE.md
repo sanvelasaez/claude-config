@@ -39,41 +39,96 @@ CAPA 3 — EXTENSIÓN (Skills + Hooks + MCP)
 
 ---
 
-## 🚀 BOOTSTRAP — Creación de archivos en instalación nueva
+## 🚀 BOOTSTRAP — Instalación en sistema nuevo
 
-> Al ejecutar Claude Code por primera vez en un equipo, o al detectar que `~/.claude/` no está configurado correctamente, Claude debe ejecutar este proceso **antes de cualquier otra tarea**.
+> Al clonar este repositorio en un equipo nuevo, ejecutar `bootstrap.py` **antes de cualquier otra tarea**.
+> El script instala dependencias, copia los archivos a `~/.claude/` y verifica que todo funciona.
 
-### Verificación y creación de la estructura global
+### Instalación rápida (un comando)
 
-Claude comprueba la existencia de cada archivo y directorio. Si no existe, lo crea con su contenido base:
-
-```
-VERIFICAR Y CREAR si no existen:
-
-~/.claude/
-├── CLAUDE.md            → este archivo (ya existe si llegas hasta aquí)
-├── settings.json        → permisos globales + hooks globales (plantilla en sección Permisos)
-├── skills/              → directorio vacío; rellenar según sección Skills
-├── agents/              → directorio vacío; rellenar según sección Subagentes
-└── commands/            → directorio vacío; añadir slash commands globales si se desean
-
-Archivos de referencia (copiar y mantener junto a este archivo, activar por proyecto):
-└── git-workflow.md      → NO activo por defecto; copiar a .claude/ del proyecto cuando se necesite
+```bash
+git clone https://github.com/sanvelasaez/claude-config.git
+cd claude-config
+python3 bootstrap.py
 ```
 
-### Orden de creación en una instalación nueva
-
-```
-1. Crear ~/.claude/settings.json con permisos y hooks globales base
-2. Crear ~/.claude/skills/ con las dos skills de prioridad máxima primero
-   (centinel-auditor y skill-finder, ver sección Skills)
-3. Crear el resto de skills base
-4. Crear ~/.claude/agents/ con los archivos de cada subagente
-5. Configurar ~/.claude.json con MCP de filesystem si se va a usar
-6. Informar al usuario de todo lo creado y guiar el siguiente paso
+Para verificar sin instalar:
+```bash
+python3 bootstrap.py --check
 ```
 
-> Si algún archivo ya existe, **no sobreescribirlo**. Informar al usuario de su estado y preguntar si quiere revisarlo.
+Para forzar la actualización de archivos ya existentes:
+```bash
+python3 bootstrap.py --force
+```
+
+---
+
+### Dependencias del sistema
+
+| Dependencia | Versión mínima | Requerida para | Cómo instalar |
+|---|---|---|---|
+| **Python** | 3.9+ | Hooks (`centinel_preflight.py`) y MCP server | https://python.org |
+| **pip** | cualquiera | Instalar paquetes Python | viene con Python |
+| **Claude Code** | última | Todo | `npm install -g @anthropic-ai/claude-code` |
+| Node.js | 18+ | MCPs con `npx` (filesystem, github…) | https://nodejs.org |
+| npm | viene con Node | MCPs con `npx` | viene con Node.js |
+| Git | cualquiera | Flujo `git-workflow.md` | https://git-scm.com |
+
+> **Solo Python y Claude Code son estrictamente necesarios.** Node.js y Git son opcionales según el uso.
+
+### Dependencias Python
+
+El script instala automáticamente todo lo que hay en `requirements.txt`:
+
+| Paquete | Versión | Para qué | Instalación manual |
+|---|---|---|---|
+| `mcp` | >=1.0.0 | MCP server `mcps/centinel-server.py` | `pip install mcp` |
+
+### Pasos post-instalación (manuales)
+
+Tras ejecutar `bootstrap.py`, el script indica estos pasos:
+
+**1. Activar el MCP centinel** — añadir a `~/.claude.json`:
+```json
+{
+  "mcpServers": {
+    "centinel": {
+      "command": "python3",
+      "args": ["~/.claude/mcps/centinel-server.py"]
+    }
+  }
+}
+```
+
+**2. Verificar en Claude Code** — iniciar una sesión y confirmar que:
+- Los hooks se ejecutan (intentar un comando bloqueado y ver el mensaje `[CENTINEL] BLOQUEADO`)
+- El MCP centinel aparece disponible en la sesión
+
+**3. Activar flujos opcionales por proyecto** — en `.claude/CLAUDE.md` del proyecto:
+```
+@~/.claude/git-workflow.md          ← si el proyecto usa Git workflow
+@~/.claude/agent-coordination.md   ← si el proyecto usa múltiples agentes
+```
+
+---
+
+### Qué hace bootstrap.py exactamente
+
+```
+1. Verifica Python >= 3.9
+2. Verifica Claude Code en PATH (avisa si no está)
+3. Verifica Node.js, npm, Git (avisa si no están, no bloquea)
+4. Instala paquetes pip de requirements.txt si faltan
+5. Copia skills/, agents/, hooks/, mcps/ → ~/.claude/
+6. Copia CLAUDE.md, settings.json, SKILL-REGISTRY.md → ~/.claude/
+7. Copia git-workflow.md, agent-coordination.md → ~/.claude/
+8. En Unix/Mac: hace ejecutable hooks/centinel_preflight.py
+9. Verifica el hook: comando seguro pasa, rm -rf / queda bloqueado
+10. Muestra los pasos manuales restantes
+```
+
+> Si algún archivo ya existe, **no lo sobreescribe** (usa `--force` para actualizar).
 
 ---
 
@@ -123,23 +178,20 @@ Además, añadir los permisos necesarios en `.claude/settings.json` del proyecto
 
 ### Guía de instalación completa (ejecutar en instalación nueva)
 
-**Paso 0 — Copiar los archivos base del repositorio**
-Clonar o copiar el contenido de este repositorio a `~/.claude/`:
+**Paso 0 — Ejecutar bootstrap.py**
+Este script instala todo automáticamente (ver sección Bootstrap al inicio de este archivo):
 ```bash
-cp -r skills/ ~/.claude/skills/
-cp -r agents/ ~/.claude/agents/
-cp settings.json ~/.claude/settings.json
-cp git-workflow.md ~/.claude/git-workflow.md
-cp SKILL-REGISTRY.md ~/.claude/SKILL-REGISTRY.md
+python3 bootstrap.py
 ```
-> Si algún archivo ya existe, **no sobreescribirlo**. Revisar las diferencias primero.
+> Si algún archivo ya existe, no lo sobreescribe. Para actualizar: `python3 bootstrap.py --force`
 
-**Paso 1 — Verificar las dos skills de prioridad máxima**
-Confirmar que existen en `~/.claude/skills/`:
-- `centinel-auditor.md` — auditoría de fuentes externas
-- `skill-finder.md` — búsqueda de skills
+**Paso 1 — Verificar las skills de prioridad máxima**
+Tras el bootstrap, confirmar que existen en `~/.claude/skills/`:
+- `centinel-auditor.md` — auditoría de fuentes externas (prioridad 1)
+- `centinel-update.md` — mantenimiento de IOCs y configuración (prioridad 2)
+- `skill-finder.md` — búsqueda de skills (prioridad 3)
 
-Estas dos deben existir antes de instalar o buscar cualquier otra cosa.
+Estas tres deben existir antes de instalar o buscar cualquier otra cosa.
 
 **Paso 2 — Buscar skills externas adicionales (opcional)**
 Usar `skill-finder` para buscar en fuentes externas cuando se necesite una capacidad no cubierta:
