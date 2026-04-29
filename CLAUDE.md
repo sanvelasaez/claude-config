@@ -181,15 +181,16 @@ El estado de seguridad y origen de cada skill se mantiene en `SKILL-REGISTRY.md`
 |---|---|---|---|
 | 🔴 **1** | `centinel-auditor` | Auditar cualquier elemento de origen externo antes de instalarlo o usarlo: skills, MCP servers, dependencias, scripts, herramientas | todos |
 | 🔴 **2** | `skill-finder` | Buscar skills existentes cuando se necesita capacidad nueva para una tarea que ninguna skill actual cubre | sesión principal |
-| 3 | `code-review` | Revisar código en busca de bugs, problemas de seguridad y rendimiento antes de considerar cualquier implementación terminada | `@reviewer` |
-| 4 | `security-audit` | Auditar código que maneje datos sensibles, autenticación, autorización o credenciales | `@reviewer`, `@qa` |
-| 5 | `test-writer` | Escribir tests para código nuevo o modificado, o cuando @qa detecta gaps de cobertura | `@qa` |
-| 6 | `debug-tracer` | Depurar errores con análisis sistemático de hipótesis cuando el origen no es obvio o el error es intermitente | `@debugger` |
-| 7 | `arch-patterns` | Seleccionar y aplicar patrones de diseño al diseñar un módulo nuevo o refactorizar estructura compleja | `@architect` |
-| 8 | `doc-writer` | Generar documentación inline o de módulo al crear o modificar APIs públicas o código con lógica no obvia | todos |
-| 9 | `ui-design-review` | Revisar contraste, tipografía, espaciado, estados de componente y accesibilidad en interfaces frontend | `@designer` |
-| 10 | `perf-profiler` | Analizar rendimiento e identificar cuellos de botella cuando hay degradación observable | `@reviewer`, `@qa` |
-| 11 | `reflection` | Analizar el historial de la sesión para detectar errores, reglas no aplicadas y patrones a sistematizar | sesión principal |
+| 3 | `centinel-update` | Mantener actualizada la configuración de seguridad: IOCs, hooks, skills. Activar ante nuevas amenazas o cada 3 meses | sesión principal |
+| 4 | `code-review` | Revisar código en busca de bugs, problemas de seguridad y rendimiento antes de considerar cualquier implementación terminada | `@reviewer` |
+| 5 | `security-audit` | Auditar código que maneje datos sensibles, autenticación, autorización o credenciales | `@reviewer`, `@qa` |
+| 6 | `test-writer` | Escribir tests para código nuevo o modificado, o cuando @qa detecta gaps de cobertura | `@qa` |
+| 7 | `debug-tracer` | Depurar errores con análisis sistemático de hipótesis cuando el origen no es obvio o el error es intermitente | `@debugger` |
+| 8 | `arch-patterns` | Seleccionar y aplicar patrones de diseño al diseñar un módulo nuevo o refactorizar estructura compleja | `@architect` |
+| 9 | `doc-writer` | Generar documentación inline o de módulo al crear o modificar APIs públicas o código con lógica no obvia | todos |
+| 10 | `ui-design-review` | Revisar contraste, tipografía, espaciado, estados de componente y accesibilidad en interfaces frontend | `@designer` |
+| 11 | `perf-profiler` | Analizar rendimiento e identificar cuellos de botella cuando hay degradación observable | `@reviewer`, `@qa` |
+| 12 | `reflection` | Analizar el historial de la sesión para detectar errores, reglas no aplicadas y patrones a sistematizar | sesión principal |
 
 > Esta tabla es la fuente de verdad del estado de skills. Se actualiza al añadir o eliminar cualquier skill (ver regla de actualización automática).
 > El origen, seguridad y fechas de cada skill se registran en `SKILL-REGISTRY.md`.
@@ -201,7 +202,8 @@ El estado de seguridad y origen de cada skill se mantiene en `SKILL-REGISTRY.md`
 > El contenido completo de cada skill está en su archivo correspondiente dentro de `skills/`.
 > Esos archivos son la **fuente de verdad** — no mantener copias inline aquí.
 
-- `skills/centinel-auditor.md` — proceso de auditoría de 4 pasos + veredicto + regla absoluta
+- `skills/centinel-auditor.md` — auditoría de elementos externos: 7 pasos, multi-fuente, supply chain
+- `skills/centinel-update.md` — mantenimiento de IOCs, hooks y skills; checklist trimestral
 - `skills/skill-finder.md` — proceso de búsqueda en GitHub y docs de Anthropic + evaluación + registro
 - `skills/code-review.md`, `security-audit.md`, `test-writer.md`, `debug-tracer.md`
 - `skills/arch-patterns.md`, `doc-writer.md`, `ui-design-review.md`, `perf-profiler.md`, `reflection.md`
@@ -290,18 +292,30 @@ Cuando la sesión principal coordina más de un subagente simultáneamente, acti
 
 ### MCP global (`~/.claude.json`)
 
-Solo el servidor de **filesystem** es candidato global, restringido al directorio de trabajo:
+**centinel** es el único MCP global recomendado — proporciona enriquecimiento de seguridad a Claude:
 
 ```json
 {
   "mcpServers": {
+    "centinel": {
+      "command": "python3",
+      "args": ["~/.claude/mcps/centinel-server.py"]
+    }
+  }
+}
+```
+
+> Requiere `pip install mcp` una sola vez. Solo consulta OSV.dev y GitHub Advisory (sin auth).
+> Herramientas disponibles: `scan_package`, `check_ioc`, `add_ioc`, `ioc_stats`.
+
+**Filesystem** puede añadirse si se trabaja en múltiples proyectos y se necesita acceso por MCP:
+```json
+{
+  "mcpServers": {
+    "centinel": { "command": "python3", "args": ["~/.claude/mcps/centinel-server.py"] },
     "filesystem": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-filesystem",
-        "/home/user/projects"
-      ]
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/home/user/projects"]
     }
   }
 }
@@ -543,8 +557,9 @@ Aplicar antes de considerar cualquier implementación terminada:
 ├── sessions.log                       ← Generado por hook (SessionStart/End)
 ├── audit.log                          ← Generado por hook (PostToolUse Write — ruta del archivo)
 ├── skills/
-│   ├── centinel-auditor.md    ← INSTALAR PRIMERO (prioridad máxima)
-│   ├── skill-finder.md               ← INSTALAR SEGUNDO
+│   ├── centinel-auditor.md            ← INSTALAR PRIMERO (prioridad máxima)
+│   ├── centinel-update.md             ← INSTALAR SEGUNDO (mantenimiento de seguridad)
+│   ├── skill-finder.md                ← INSTALAR TERCERO
 │   ├── code-review.md
 │   ├── security-audit.md
 │   ├── test-writer.md
@@ -554,6 +569,11 @@ Aplicar antes de considerar cualquier implementación terminada:
 │   ├── ui-design-review.md
 │   ├── perf-profiler.md
 │   └── reflection.md
+├── hooks/
+│   ├── centinel_preflight.py          ← Hook de bloqueo en tiempo real
+│   └── centinel_iocs.json             ← Base de IOCs — actualizar con centinel-update
+├── mcps/
+│   └── centinel-server.py             ← MCP server de enriquecimiento (requiere: pip install mcp)
 ├── agents/
 │   ├── explorer.md
 │   ├── architect.md

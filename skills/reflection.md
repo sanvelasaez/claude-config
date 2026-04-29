@@ -62,3 +62,5 @@ La reflexión no tiene que encontrar problemas donde no los hay.
 Si se identifican cambios en CLAUDE.md: presentarlos al usuario y pedir confirmación antes de modificar.
 Si se identifica una skill nueva: seguir el proceso de skill-finder y centinel-auditor.
 Si se identifica un hook nuevo: proponer el cambio en settings.json al usuario.
+Si el hook dejó pasar algo que debería haber bloqueado: activar centinel-update para añadir el IOC.
+Si han pasado más de 3 meses desde `_updated` en centinel_iocs.json: recomendar ejecutar centinel-update.

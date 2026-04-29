@@ -23,6 +23,7 @@
 | Nombre | Origen | Seguridad | Versión/Fecha | Notas |
 |---|---|---|---|---|
 | `centinel-auditor` | Creación propia | 🔵 PROPIA | 2026-04 | Skill de seguridad base — prioridad máxima. Enriquecida con IOCs de MCP Sentinel |
+| `centinel-update` | Creación propia | 🔵 PROPIA | 2026-04 | Mantenimiento de IOCs, hooks y skills — checklist trimestral + respuesta a incidentes |
 | `skill-finder` | Creación propia | 🔵 PROPIA | 2026-04 | Búsqueda de skills — prioridad máxima |
 | `code-review` | Creación propia | 🔵 PROPIA | 2026-04 | Revisión de código pre-merge |
 | `security-audit` | Creación propia | 🔵 PROPIA | 2026-04 | Auditoría OWASP y autenticación |
