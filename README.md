@@ -24,6 +24,14 @@ O desde dentro de Claude Code:
 /setup
 ```
 
+Para verificar que todo está funcionando correctamente (sin instalar nada):
+
+```bash
+npx github:sanvelasaez/claude-config --check
+```
+
+Comprueba: archivos instalados, hook configurado en `settings.json`, MCP configurado en `~/.claude.json`, que el hook bloquea comandos peligrosos y permite los seguros, y que el MCP server responde al protocolo MCP.
+
 ## Qué incluye
 
 **Sistema de seguridad Centinel**
