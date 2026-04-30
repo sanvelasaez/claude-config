@@ -402,6 +402,27 @@ function runChecks() {
   return allOk;
 }
 
+// ── Confirmación interactiva ──────────────────────────────────────────────────
+
+function confirmarInstalacion() {
+  sep();
+  console.log("  ⚠  AVISO DE SEGURIDAD");
+  console.log(`  Esta operación copiará archivos a: ${CLAUDE_DIR}`);
+  if (force) {
+    console.log("  Modo --force: los archivos existentes SERÁN SOBREESCRITOS.");
+  } else {
+    console.log("  Los archivos existentes se respetan; solo se añade lo que falta.");
+  }
+  sep();
+  process.stdout.write("  ¿Deseas continuar? [s/N]: ");
+
+  const buf = Buffer.alloc(16);
+  let n = 0;
+  try { n = fs.readSync(0, buf, 0, 16); } catch { return true; } // stdin no interactivo → continuar
+  const respuesta = buf.slice(0, n).toString().trim().toLowerCase();
+  return respuesta === "s" || respuesta === "si" || respuesta === "sí";
+}
+
 // ── Pasos siguientes ──────────────────────────────────────────────────────────
 
 function printNextSteps() {
@@ -444,6 +465,12 @@ if (check) {
   }
   process.exit(0);
 }
+
+if (!confirmarInstalacion()) {
+  console.log("  Instalación cancelada.");
+  process.exit(0);
+}
+sep();
 
 console.log(`2. ARCHIVOS → ${CLAUDE_DIR}`);
 if (!force) info("Los archivos existentes NO se sobreescriben (usa --force para actualizar)");
