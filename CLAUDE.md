@@ -228,6 +228,7 @@ El estado de seguridad y origen de cada skill se mantiene en `SKILL-REGISTRY.md`
 | 10 | `ui-design-review` | Revisar contraste, tipografía, espaciado, estados de componente y accesibilidad en interfaces frontend | `@designer` |
 | 11 | `perf-profiler` | Analizar rendimiento e identificar cuellos de botella cuando hay degradación observable | `@reviewer`, `@qa` |
 | 12 | `reflection` | Analizar el historial de la sesión para detectar errores, reglas no aplicadas y patrones a sistematizar | sesión principal |
+| 13 | `skill-creator` | Crear skills nuevas desde cero, mejorar skills existentes y optimizar su descripción de activación mediante ciclo de evaluación iterativo | sesión principal |
 
 > Esta tabla es la fuente de verdad del estado de skills. Se actualiza al añadir o eliminar cualquier skill (ver regla de actualización automática).
 > El origen, seguridad y fechas de cada skill se registran en `SKILL-REGISTRY.md`.
@@ -244,6 +245,7 @@ El estado de seguridad y origen de cada skill se mantiene en `SKILL-REGISTRY.md`
 - `skills/find-skills/SKILL.md` — descubrimiento en skills.sh + GitHub + Anthropic docs, con centinel-auditor integrado (fusión de skill-finder + vercel-labs/find-skills)
 - `skills/code-review/SKILL.md`, `skills/security-audit/SKILL.md`, `skills/test-writer/SKILL.md`, `skills/debug-tracer/SKILL.md`
 - `skills/arch-patterns/SKILL.md`, `skills/doc-writer/SKILL.md`, `skills/ui-design-review/SKILL.md`, `skills/perf-profiler/SKILL.md`, `skills/reflection/SKILL.md`
+- `skills/skill-creator/SKILL.md` — crear y mejorar skills con ciclo eval iterativo (Anthropic oficial, Apache 2.0)
 
 ---
 

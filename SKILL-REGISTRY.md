@@ -33,7 +33,8 @@
 | `ui-design-review` | Creación propia | 🔵 PROPIA | 2026-04 | Revisión visual y accesibilidad WCAG |
 | `perf-profiler` | Creación propia | 🔵 PROPIA | 2026-04 | Análisis de rendimiento basado en métricas |
 | `reflection` | Creación propia | 🔵 PROPIA | 2026-04 | Análisis de sesión para mejora continua |
-| `find-skills` | Tercero: vercel-labs/skills (MIT) + Creación propia | 🟡 CONFIABLE | 2026-04-30 | Fusión de skill-finder (propia) + vercel-labs/find-skills. Traducida al español. Añade leaderboard skills.sh, CLI npx skills, criterios de calidad. centinel-auditor obligatorio antes de instalar. Sin flag -y. |
+| `find-skills` | Tercero: vercel-labs/skills (MIT) + Creación propia | 🟡 CONFIABLE | 2026-04-30 | Fusión de skill-finder (propia) + vercel-labs/find-skills. Traducida al español. Añade leaderboard skills.sh, CLI npx skills, criterios de calidad. centinel-auditor obligatorio antes de instalar. Sin flag -y. Paso 9: traducción al español obligatoria tras instalar cualquier skill. |
+| `skill-creator` | Tercero: anthropics/skills (Apache 2.0) | 🟢 VERIFICADA | 2026-04-30 | Crear y mejorar skills con ciclo de evaluación iterativo. 177.3K installs. Gen=Safe, Socket=0, Snyk=Low Risk. Traducida al español. |
 
 ---
 
@@ -53,6 +54,7 @@
 |---|---|---|---|---|
 | `soy-rafa/claude-mcp-sentinel` | Repo GitHub / Hook | ⚠️ PRECAUCIÓN | 2026-04-29 | Repo legítimo con buenas intenciones; no instalado como MCP. IOC patterns extraídos e integrados en centinel_iocs.json y centinel-auditor.md |
 | `vercel-labs/find-skills` | Skill / SKILL.md | ⚠️ PRECAUCIÓN→🟡 | 2026-04-30 | Fuente legítima (Vercel, MIT, 16.6K stars). Instalada con modificaciones: proceso de instalación requiere centinel-auditor obligatorio (paso 6) y sin flag -y. Riesgo mitigado: el ecosistema skills.sh tiene 13.4% de skills con issues críticos según ToxicSkills/Snyk (2026). Verificaciones de Vercel confirman que sus paquetes npm no fueron comprometidos en el incidente de abril 2026. |
+| `anthropics/skills@skill-creator` | Skill / SKILL.md + scripts + agentes | 🟢 APROBADA | 2026-04-30 | Anthropic oficial (127K stars, Apache 2.0). Gen=Safe, Socket=0 alertas, Snyk=Low Risk. SKILL.md analizado: sin llamadas de red inesperadas, sin exfiltración, con sección de seguridad explícita. Traducida al español tras instalación. |
 
 ---
 

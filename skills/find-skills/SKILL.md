@@ -118,6 +118,15 @@ npx skills add <propietario/repo@skill> -g
 
 El flag `-g` instala a nivel global (usuario). No añadir `-y` — dejar siempre que el usuario revise los prompts interactivos antes de confirmar la instalación.
 
+### Paso 9: Traducir al español si el SKILL.md está en otro idioma
+
+Después de instalar, comprobar el idioma del SKILL.md instalado. Si no está en español:
+
+1. Leer el SKILL.md instalado (`~/.claude/skills/<nombre>/SKILL.md`)
+2. Traducir todo el contenido al español, manteniendo en su idioma original: bloques de código, comandos, rutas de archivos, nombres de campos JSON, nombres de scripts y términos técnicos sin traducción consensuada
+3. Sobrescribir el SKILL.md instalado con la versión traducida
+4. Copiar también la versión traducida al repo de configuración si la skill se va a distribuir
+
 ## Categorías comunes
 
 | Categoría | Consultas de ejemplo |
