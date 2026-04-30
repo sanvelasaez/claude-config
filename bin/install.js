@@ -30,6 +30,7 @@ const COPY_ITEMS = [
   "hooks",
   "mcps",
   "commands",
+  "templates",
 ];
 
 // ── Salida ────────────────────────────────────────────────────────────────────
@@ -126,27 +127,28 @@ function ensurePython() {
 
 // ── Copia de archivos ─────────────────────────────────────────────────────────
 
-function copyDir(src, dst) {
-  fs.mkdirSync(dst, { recursive: true });
-  for (const entry of fs.readdirSync(src)) {
-    const s = path.join(src, entry);
-    const d = path.join(dst, entry);
-    if (fs.statSync(s).isDirectory()) copyDir(s, d);
-    else fs.copyFileSync(s, d);
-  }
-}
-
+/**
+ * Copia src → dst.
+ * - Directorios: merge recursivo. Entra siempre y copia lo que falta.
+ * - Archivos: solo copia si no existe (o si --force).
+ * Devuelve "copied" | "updated" | "skipped".
+ */
 function copyItem(src, dst) {
-  if (fs.existsSync(dst) && !force) return "skipped";
-  const action = fs.existsSync(dst) ? "updated" : "copied";
   if (fs.statSync(src).isDirectory()) {
-    if (fs.existsSync(dst)) fs.rmSync(dst, { recursive: true, force: true });
-    copyDir(src, dst);
-  } else {
-    fs.mkdirSync(path.dirname(dst), { recursive: true });
-    fs.copyFileSync(src, dst);
+    fs.mkdirSync(dst, { recursive: true });
+    let algoCambiado = false;
+    for (const entry of fs.readdirSync(src)) {
+      const resultado = copyItem(path.join(src, entry), path.join(dst, entry));
+      if (resultado !== "skipped") algoCambiado = true;
+    }
+    return algoCambiado ? "updated" : "skipped";
   }
-  return action;
+  // Archivo individual
+  if (fs.existsSync(dst) && !force) return "skipped";
+  const accion = fs.existsSync(dst) ? "updated" : "copied";
+  fs.mkdirSync(path.dirname(dst), { recursive: true });
+  fs.copyFileSync(src, dst);
+  return accion;
 }
 
 function installFiles() {
