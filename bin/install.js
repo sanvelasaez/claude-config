@@ -10,12 +10,12 @@
 
 "use strict";
 
-const fs  = require("fs");
+const fs = require("fs");
 const path = require("path");
-const os  = require("os");
+const os = require("os");
 const { spawnSync } = require("child_process");
 
-const ROOT       = path.join(__dirname, "..");
+const ROOT = path.join(__dirname, "..");
 const CLAUDE_DIR = path.join(os.homedir(), ".claude");
 const CLAUDE_JSON = path.join(os.homedir(), ".claude.json");
 
@@ -31,17 +31,18 @@ const COPY_ITEMS = [
   "mcps",
   "commands",
   "templates",
+  "scripts",
 ];
 
 // ── Salida ────────────────────────────────────────────────────────────────────
-const ok   = (m) => console.log(`  [OK]   ${m}`);
+const ok = (m) => console.log(`  [OK]   ${m}`);
 const warn = (m) => console.log(`  [WARN] ${m}`);
-const err  = (m) => console.log(`  [ERR]  ${m}`);
+const err = (m) => console.log(`  [ERR]  ${m}`);
 const info = (m) => console.log(`         ${m}`);
-const sep  = ()  => console.log();
+const sep = () => console.log();
 
 // ── Argumentos ────────────────────────────────────────────────────────────────
-const args  = process.argv.slice(2);
+const args = process.argv.slice(2);
 const force = args.includes("--force");
 const check = args.includes("--check");
 
@@ -50,19 +51,38 @@ const check = args.includes("--check");
 /** Instala un paquete usando el gestor disponible en la plataforma actual. */
 function installPackage(wingetId, brewId, aptId) {
   if (process.platform === "win32") {
-    const r = spawnSync("winget", [
-      "install", "--id", wingetId, "--source", "winget",
-      "-e", "--accept-package-agreements", "--accept-source-agreements",
-    ], { stdio: "inherit", encoding: "utf8" });
+    const r = spawnSync(
+      "winget",
+      [
+        "install",
+        "--id",
+        wingetId,
+        "--source",
+        "winget",
+        "-e",
+        "--accept-package-agreements",
+        "--accept-source-agreements",
+      ],
+      { stdio: "inherit", encoding: "utf8" },
+    );
     return r.status === 0;
   }
   if (process.platform === "darwin") {
-    const r = spawnSync("brew", ["install", brewId], { stdio: "inherit", encoding: "utf8" });
+    const r = spawnSync("brew", ["install", brewId], {
+      stdio: "inherit",
+      encoding: "utf8",
+    });
     return r.status === 0;
   }
   // Linux: probar apt-get, después dnf
-  for (const [mgr, arg] of [["apt-get", aptId], ["dnf", aptId]]) {
-    const r = spawnSync("sudo", [mgr, "install", "-y", arg], { stdio: "inherit", encoding: "utf8" });
+  for (const [mgr, arg] of [
+    ["apt-get", aptId],
+    ["dnf", aptId],
+  ]) {
+    const r = spawnSync("sudo", [mgr, "install", "-y", arg], {
+      stdio: "inherit",
+      encoding: "utf8",
+    });
     if (r.status === 0) return true;
   }
   return false;
@@ -70,38 +90,78 @@ function installPackage(wingetId, brewId, aptId) {
 
 function ensureNode() {
   const [major] = process.versions.node.split(".").map(Number);
-  if (major >= 18) { ok(`Node.js ${process.versions.node} (>= 18)`); return; }
-  warn(`Node.js ${process.versions.node} demasiado antiguo. Se necesita >= 18. Actualizando...`);
+  if (major >= 18) {
+    ok(`Node.js ${process.versions.node} (>= 18)`);
+    return;
+  }
+  warn(
+    `Node.js ${process.versions.node} demasiado antiguo. Se necesita >= 18. Actualizando...`,
+  );
   const installed = installPackage("OpenJS.NodeJS.LTS", "node", "nodejs");
   if (installed) {
-    ok("Node.js LTS instalado. Reinicia el terminal y ejecuta el instalador de nuevo.");
+    ok(
+      "Node.js LTS instalado. Reinicia el terminal y ejecuta el instalador de nuevo.",
+    );
     process.exit(0);
   }
-  err("No se pudo instalar Node.js automáticamente. Instalar desde: https://nodejs.org");
+  err(
+    "No se pudo instalar Node.js automáticamente. Instalar desde: https://nodejs.org",
+  );
   process.exit(1);
 }
 
 function ensureClaudeCode() {
-  const r = spawnSync(process.platform === "win32" ? "where" : "which", ["claude"], { encoding: "utf8" });
-  if (r.status === 0) { ok("Claude Code — encontrado en PATH"); return; }
+  const r = spawnSync(
+    process.platform === "win32" ? "where" : "which",
+    ["claude"],
+    { encoding: "utf8" },
+  );
+  if (r.status === 0) {
+    ok("Claude Code — encontrado en PATH");
+    return;
+  }
   warn("Claude Code — no encontrado. Instalando...");
-  const r2 = spawnSync("npm", ["install", "-g", "@anthropic-ai/claude-code"], { stdio: "inherit", encoding: "utf8" });
-  if (r2.status === 0) { ok("Claude Code instalado correctamente"); return; }
-  err("No se pudo instalar Claude Code. Instalar manualmente: npm install -g @anthropic-ai/claude-code");
+  const r2 = spawnSync("npm", ["install", "-g", "@anthropic-ai/claude-code"], {
+    stdio: "inherit",
+    encoding: "utf8",
+  });
+  if (r2.status === 0) {
+    ok("Claude Code instalado correctamente");
+    return;
+  }
+  err(
+    "No se pudo instalar Claude Code. Instalar manualmente: npm install -g @anthropic-ai/claude-code",
+  );
 }
 
 function ensureGit() {
-  const r = spawnSync(process.platform === "win32" ? "where" : "which", ["git"], { encoding: "utf8" });
-  if (r.status === 0) { ok("Git — encontrado en PATH"); return; }
+  const r = spawnSync(
+    process.platform === "win32" ? "where" : "which",
+    ["git"],
+    { encoding: "utf8" },
+  );
+  if (r.status === 0) {
+    ok("Git — encontrado en PATH");
+    return;
+  }
   warn("Git — no encontrado. Instalando...");
   const installed = installPackage("Git.Git", "git", "git");
-  if (installed) { ok("Git instalado correctamente. Puede requerir reiniciar el terminal."); return; }
-  warn("No se pudo instalar Git automáticamente. Instalar desde: https://git-scm.com");
+  if (installed) {
+    ok("Git instalado correctamente. Puede requerir reiniciar el terminal.");
+    return;
+  }
+  warn(
+    "No se pudo instalar Git automáticamente. Instalar desde: https://git-scm.com",
+  );
 }
 
 function getPythonCmd() {
   for (const cmd of ["python3", "python"]) {
-    const w = spawnSync(process.platform === "win32" ? "where" : "which", [cmd], { encoding: "utf8" });
+    const w = spawnSync(
+      process.platform === "win32" ? "where" : "which",
+      [cmd],
+      { encoding: "utf8" },
+    );
     if (w.status !== 0) continue;
     const v = spawnSync(cmd, ["--version"], { encoding: "utf8" });
     const ver = (v.stdout || v.stderr || "").trim();
@@ -112,7 +172,10 @@ function getPythonCmd() {
 
 function checkPython() {
   const found = getPythonCmd();
-  if (found) { ok(`Python — ${found.ver} (${found.cmd})`); return true; }
+  if (found) {
+    ok(`Python — ${found.ver} (${found.cmd})`);
+    return true;
+  }
   warn("Python 3 — NO encontrado");
   return false;
 }
@@ -121,8 +184,15 @@ function ensurePython() {
   if (checkPython()) return;
   info("Instalando Python 3...");
   const installed = installPackage("Python.Python.3", "python3", "python3");
-  if (installed) { ok("Python 3 instalado correctamente. Puede requerir reiniciar el terminal."); return; }
-  err("No se pudo instalar Python 3 automáticamente. Instalar desde: https://www.python.org/downloads/");
+  if (installed) {
+    ok(
+      "Python 3 instalado correctamente. Puede requerir reiniciar el terminal.",
+    );
+    return;
+  }
+  err(
+    "No se pudo instalar Python 3 automáticamente. Instalar desde: https://www.python.org/downloads/",
+  );
 }
 
 // ── Copia de archivos ─────────────────────────────────────────────────────────
@@ -157,13 +227,24 @@ function installFiles() {
   for (const item of COPY_ITEMS) {
     const src = path.join(ROOT, item);
     const dst = path.join(CLAUDE_DIR, item);
-    if (!fs.existsSync(src)) { warn(`No encontrado en el paquete: ${item}`); stats.errors++; continue; }
+    if (!fs.existsSync(src)) {
+      warn(`No encontrado en el paquete: ${item}`);
+      stats.errors++;
+      continue;
+    }
     try {
       const action = copyItem(src, dst);
       stats[action]++;
-      const label = { copied: "NUEVO    ", updated: "ACT.     ", skipped: "EXISTENTE" }[action];
+      const label = {
+        copied: "NUEVO    ",
+        updated: "ACT.     ",
+        skipped: "EXISTENTE",
+      }[action];
       info(`[${label}] ${item}  →  ${dst}`);
-    } catch (e) { err(`Error copiando ${item}: ${e.message}`); stats.errors++; }
+    } catch (e) {
+      err(`Error copiando ${item}: ${e.message}`);
+      stats.errors++;
+    }
   }
   return stats;
 }
@@ -176,28 +257,41 @@ function ensureHookInSettings() {
   if (!fs.existsSync(settingsPath)) return;
 
   let settings;
-  try { settings = JSON.parse(fs.readFileSync(settingsPath, "utf8")); }
-  catch { warn("settings.json no es JSON válido — hooks no configurados"); return; }
+  try {
+    settings = JSON.parse(fs.readFileSync(settingsPath, "utf8"));
+  } catch {
+    warn("settings.json no es JSON válido — hooks no configurados");
+    return;
+  }
 
   // Comprobar si algún hook de centinel ya está presente
   const allEntries = Object.values(settings.hooks || {}).flat();
   const tieneCentinel = allEntries.some((h) =>
-    (h.hooks || []).some((hh) => (hh.command || "").includes("centinel_preflight"))
+    (h.hooks || []).some((hh) =>
+      (hh.command || "").includes("centinel_preflight"),
+    ),
   );
-  if (tieneCentinel) { ok("settings.json — hooks centinel ya presentes"); return; }
+  if (tieneCentinel) {
+    ok("settings.json — hooks centinel ya presentes");
+    return;
+  }
 
   // Leer la plantilla y mergear los hooks que falten
   const templatePath = path.join(ROOT, "settings.json");
   let template;
-  try { template = JSON.parse(fs.readFileSync(templatePath, "utf8")); }
-  catch { warn("settings.json de plantilla no encontrado — hooks no configurados"); return; }
+  try {
+    template = JSON.parse(fs.readFileSync(templatePath, "utf8"));
+  } catch {
+    warn("settings.json de plantilla no encontrado — hooks no configurados");
+    return;
+  }
 
   settings.hooks = settings.hooks || {};
   for (const [evento, entradas] of Object.entries(template.hooks || {})) {
     settings.hooks[evento] = settings.hooks[evento] || [];
     for (const entrada of entradas) {
       const yaPresente = settings.hooks[evento].some(
-        (e) => JSON.stringify(e) === JSON.stringify(entrada)
+        (e) => JSON.stringify(e) === JSON.stringify(entrada),
       );
       if (!yaPresente) settings.hooks[evento].push(entrada);
     }
@@ -214,18 +308,26 @@ function ensureHookInSettings() {
 // ── Configuración MCP en ~/.claude.json ───────────────────────────────────────
 
 function configureMcp() {
-  const serverPath = path.join(CLAUDE_DIR, "mcps", "centinel-server.js");
+  const serverPath = path.join(CLAUDE_DIR, "mcps", "centinel-server.py");
+  const pyCmd = getPythonCmd()?.cmd || "python3";
   let config = {};
   if (fs.existsSync(CLAUDE_JSON)) {
-    try { config = JSON.parse(fs.readFileSync(CLAUDE_JSON, "utf8")); }
-    catch { warn("~/.claude.json no es JSON válido — se deja sin modificar"); return; }
+    try {
+      config = JSON.parse(fs.readFileSync(CLAUDE_JSON, "utf8"));
+    } catch {
+      warn("~/.claude.json no es JSON válido — se deja sin modificar");
+      return;
+    }
   }
   config.mcpServers = config.mcpServers || {};
-  if (config.mcpServers.centinel) { ok("MCP centinel — ya configurado en ~/.claude.json"); return; }
-  config.mcpServers.centinel = { command: "node", args: [serverPath] };
+  if (config.mcpServers.centinel) {
+    ok("MCP centinel — ya configurado en ~/.claude.json");
+    return;
+  }
+  config.mcpServers.centinel = { command: pyCmd, args: [serverPath] };
   try {
     fs.writeFileSync(CLAUDE_JSON, JSON.stringify(config, null, 2), "utf8");
-    ok("MCP centinel — añadido a ~/.claude.json");
+    ok(`MCP centinel — añadido a ~/.claude.json (${pyCmd})`);
   } catch (e) {
     warn(`No se pudo escribir ~/.claude.json: ${e.message}`);
   }
@@ -235,10 +337,25 @@ function configureMcp() {
 
 function setHookPermissions() {
   if (process.platform === "win32") return;
-  const hook = path.join(CLAUDE_DIR, "hooks", "centinel_preflight.js");
-  if (fs.existsSync(hook)) {
-    fs.chmodSync(hook, fs.statSync(hook).mode | 0o111);
-    ok("Permisos de ejecución en hooks/centinel_preflight.js");
+  for (const f of ["hooks/centinel_preflight.py", "mcps/centinel-server.py"]) {
+    const p = path.join(CLAUDE_DIR, f);
+    if (fs.existsSync(p)) fs.chmodSync(p, fs.statSync(p).mode | 0o111);
+  }
+  ok("Permisos de ejecución en centinel_preflight.py y centinel-server.py");
+}
+
+/** Ajusta el comando python en settings.json al que está disponible en esta plataforma. */
+function fixPythonCommandInSettings() {
+  const settingsPath = path.join(CLAUDE_DIR, "settings.json");
+  if (!fs.existsSync(settingsPath)) return;
+  const pyCmd = getPythonCmd()?.cmd;
+  if (!pyCmd || pyCmd === "python3") return; // python3 es el default en el archivo
+  try {
+    const updated = fs.readFileSync(settingsPath, "utf8").replace(/\bpython3\b/g, pyCmd);
+    fs.writeFileSync(settingsPath, updated, "utf8");
+    ok(`settings.json — comando python ajustado a '${pyCmd}'`);
+  } catch (e) {
+    warn(`No se pudo ajustar el comando python en settings.json: ${e.message}`);
   }
 }
 
@@ -250,7 +367,10 @@ function checkFiles() {
   for (const item of COPY_ITEMS) {
     const p = path.join(CLAUDE_DIR, item);
     if (fs.existsSync(p)) ok(`${item}`);
-    else { err(`Falta: ${item}`); allPresent = false; }
+    else {
+      err(`Falta: ${item}`);
+      allPresent = false;
+    }
   }
   return allPresent;
 }
@@ -262,9 +382,14 @@ function checkSettingsJson() {
     const s = JSON.parse(fs.readFileSync(settingsPath, "utf8"));
     const todasEntradas = Object.values(s.hooks || {}).flat();
     const tieneHook = todasEntradas.some((h) =>
-      (h.hooks || []).some((hh) => (hh.command || "").includes("centinel_preflight"))
+      (h.hooks || []).some((hh) =>
+        (hh.command || "").includes("centinel_preflight"),
+      ),
     );
-    if (tieneHook) { ok("settings.json — hook centinel_preflight configurado"); return true; }
+    if (tieneHook) {
+      ok("settings.json — hook centinel_preflight configurado");
+      return true;
+    }
     err("settings.json — no contiene el hook centinel_preflight");
     return false;
   } catch (e) {
@@ -291,10 +416,14 @@ function checkClaudeJson() {
 
 /** 4. Hook bloquea lo peligroso y deja pasar lo seguro */
 function checkHook() {
-  const hook = path.join(CLAUDE_DIR, "hooks", "centinel_preflight.js");
-  if (!fs.existsSync(hook)) { err("hooks/centinel_preflight.js — no instalado"); return false; }
+  const hook = path.join(CLAUDE_DIR, "hooks", "centinel_preflight.py");
+  const pyCmd = getPythonCmd()?.cmd || "python3";
+  if (!fs.existsSync(hook)) {
+    err("hooks/centinel_preflight.py — no instalado");
+    return false;
+  }
 
-  let r = spawnSync("node", [hook], {
+  let r = spawnSync(pyCmd, [hook], {
     env: { ...process.env, CLAUDE_TOOL_INPUT: '{"command":"git status"}' },
     encoding: "utf8",
   });
@@ -304,40 +433,54 @@ function checkHook() {
   }
   ok("Hook — comando seguro (git status) pasa correctamente");
 
-  r = spawnSync("node", [hook], {
+  r = spawnSync(pyCmd, [hook], {
     env: { ...process.env, CLAUDE_TOOL_INPUT: '{"command":"rm -rf /"}' },
     encoding: "utf8",
   });
-  if (r.status === 1) { ok("Hook — bloquea comandos destructivos (rm -rf /)"); }
-  else { err(`Hook — NO bloqueó 'rm -rf /' (exit=${r.status})`); return false; }
+  if (r.status === 1) {
+    ok("Hook — bloquea comandos destructivos (rm -rf /)");
+  } else {
+    err(`Hook — NO bloqueó 'rm -rf /' (exit=${r.status})`);
+    return false;
+  }
 
-  r = spawnSync("node", [hook], {
+  r = spawnSync(pyCmd, [hook], {
     env: { ...process.env, CLAUDE_TOOL_INPUT: '{"url":"https://pastebin.com/abc"}' },
     encoding: "utf8",
   });
-  if (r.status === 1) { ok("Hook — bloquea URLs de exfiltración (pastebin.com)"); }
-  else { warn("Hook — no bloqueó URL de exfiltración (puede ser intencional si pastebin está en allowlist)"); }
+  if (r.status === 1) {
+    ok("Hook — bloquea URLs de exfiltración (pastebin.com)");
+  } else {
+    warn("Hook — no bloqueó URL de exfiltración (puede ser intencional si pastebin está en allowlist)");
+  }
 
-  r = spawnSync("node", [hook], {
+  r = spawnSync(pyCmd, [hook], {
     env: { ...process.env, CLAUDE_TOOL_INPUT: '{"url":"https://api.github.com/repos"}' },
     encoding: "utf8",
   });
-  if (r.status === 0) { ok("Hook — permite URLs de la allowlist (api.github.com)"); return true; }
+  if (r.status === 0) {
+    ok("Hook — permite URLs de la allowlist (api.github.com)");
+    return true;
+  }
   err("Hook — bloqueó URL de allowlist (api.github.com), revisar configuración");
   return false;
 }
 
 /** 5. MCP server arranca y responde al protocolo MCP */
 function checkMcpServer() {
-  const serverPath = path.join(CLAUDE_DIR, "mcps", "centinel-server.js");
-  if (!fs.existsSync(serverPath)) { err("mcps/centinel-server.js — no instalado"); return false; }
+  const serverPath = path.join(CLAUDE_DIR, "mcps", "centinel-server.py");
+  const pyCmd = getPythonCmd()?.cmd || "python3";
+  if (!fs.existsSync(serverPath)) {
+    err("mcps/centinel-server.py — no instalado");
+    return false;
+  }
 
   const initMsg = JSON.stringify({
     jsonrpc: "2.0", id: 1, method: "initialize",
     params: { protocolVersion: "2024-11-05", capabilities: {}, clientInfo: { name: "verifier", version: "1.0" } },
   });
 
-  const r = spawnSync("node", [serverPath], {
+  const r = spawnSync(pyCmd, [serverPath], {
     input: initMsg + "\n",
     encoding: "utf8",
     timeout: 5000,
@@ -346,12 +489,21 @@ function checkMcpServer() {
   try {
     const firstLine = (r.stdout || "").trim().split("\n")[0];
     const resp = JSON.parse(firstLine);
-    if (resp.result && resp.result.serverInfo && resp.result.serverInfo.name === "centinel") {
+    if (
+      resp.result &&
+      resp.result.serverInfo &&
+      resp.result.serverInfo.name === "centinel"
+    ) {
       ok("MCP server — responde al protocolo MCP (initialize OK)");
 
       // Verificar que tools/list devuelve las 4 herramientas esperadas
-      const listMsg = JSON.stringify({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} });
-      const r2 = spawnSync("node", [serverPath], {
+      const listMsg = JSON.stringify({
+        jsonrpc: "2.0",
+        id: 2,
+        method: "tools/list",
+        params: {},
+      });
+      const r2 = spawnSync(pyCmd, [serverPath], {
         input: initMsg + "\n" + listMsg + "\n",
         encoding: "utf8",
         timeout: 5000,
@@ -360,18 +512,57 @@ function checkMcpServer() {
       const listResp = JSON.parse(lines[lines.length - 1]);
       const tools = (listResp.result || {}).tools || [];
       const expected = ["scan_package", "check_ioc", "add_ioc", "ioc_stats"];
-      const found = expected.filter((t) => tools.some((tool) => tool.name === t));
+      const found = expected.filter((t) =>
+        tools.some((tool) => tool.name === t),
+      );
       if (found.length === expected.length) {
-        ok(`MCP server — expone las ${expected.length} herramientas: ${expected.join(", ")}`);
+        ok(
+          `MCP server — expone las ${expected.length} herramientas: ${expected.join(", ")}`,
+        );
       } else {
-        warn(`MCP server — faltan herramientas: ${expected.filter((t) => !found.includes(t)).join(", ")}`);
+        warn(
+          `MCP server — faltan herramientas: ${expected.filter((t) => !found.includes(t)).join(", ")}`,
+        );
       }
       return true;
     }
-  } catch { /* fall through */ }
+  } catch {
+    /* fall through */
+  }
 
   err("MCP server — no responde o respuesta inesperada");
   return false;
+}
+
+/** Devuelve lista de rutas relativas dentro de dir (recursivo). */
+function getAllFilesRelative(dir) {
+  const files = [];
+  const walk = (current, rel) => {
+    for (const entry of fs.readdirSync(current)) {
+      const full = path.join(current, entry);
+      const relPath = rel ? path.join(rel, entry) : entry;
+      if (fs.statSync(full).isDirectory()) walk(full, relPath);
+      else files.push(relPath);
+    }
+  };
+  walk(dir, "");
+  return files;
+}
+
+/** Detecta archivos en ~/.claude/ que ya no existen en el repo (obsoletos). */
+function checkObsoleteFiles() {
+  const obsoletos = [];
+  for (const item of COPY_ITEMS) {
+    const repoSrc = path.join(ROOT, item);
+    const claudeDst = path.join(CLAUDE_DIR, item);
+    if (!fs.existsSync(repoSrc) || !fs.existsSync(claudeDst)) continue;
+    if (!fs.statSync(repoSrc).isDirectory()) continue;
+    const repoFiles = new Set(getAllFilesRelative(repoSrc));
+    for (const f of getAllFilesRelative(claudeDst)) {
+      if (!repoFiles.has(f)) obsoletos.push({ seccion: item, archivo: f });
+    }
+  }
+  return obsoletos;
 }
 
 /** Ejecuta todas las verificaciones y devuelve true si todo está OK */
@@ -391,12 +582,22 @@ function runChecks() {
   allOk = checkClaudeJson() && allOk;
   sep();
 
-  console.log("  Hook centinel_preflight.js");
+  console.log("  Hook centinel_preflight.py");
   allOk = checkHook() && allOk;
   sep();
 
-  console.log("  MCP centinel-server.js");
+  console.log("  MCP centinel-server.py");
   allOk = checkMcpServer() && allOk;
+  sep();
+
+  console.log("  Archivos obsoletos en ~/.claude/");
+  const obsoletos = checkObsoleteFiles();
+  if (obsoletos.length === 0) {
+    ok("No hay archivos obsoletos");
+  } else {
+    warn(`${obsoletos.length} archivo(s) ya no están en el repo — pueden eliminarse manualmente:`);
+    for (const o of obsoletos) info(`  ├─ ${o.seccion}/${o.archivo}`);
+  }
   sep();
 
   return allOk;
@@ -422,16 +623,29 @@ function confirmarInstalacion() {
   if (force) {
     console.log("  Modo --force: los archivos existentes SERÁN SOBREESCRITOS.");
   } else {
-    console.log("  Los archivos existentes se respetan; solo se añade lo que falta.");
+    console.log(
+      "  Los archivos existentes se respetan; solo se añade lo que falta.",
+    );
   }
   sep();
-  process.stdout.write("  ¿Deseas continuar? [S/n]: ");
+  process.stdout.write("  ¿Deseas continuar? (s): ");
 
   const buf = Buffer.alloc(16);
   let n = 0;
-  try { n = fs.readSync(0, buf, 0, 16); } catch { return true; } // stdin no interactivo → continuar
+  try {
+    n = fs.readSync(0, buf, 0, 16);
+  } catch {
+    return true;
+  } // stdin no interactivo → continuar
   const respuesta = buf.slice(0, n).toString().trim().toLowerCase();
-  return respuesta === "" || respuesta === "s" || respuesta === "si" || respuesta === "sí";
+  return (
+    respuesta === "" ||
+    respuesta === "s" ||
+    respuesta === "si" ||
+    respuesta === "sí" ||
+    respuesta === "SI" ||
+    respuesta === "SÍ"
+  );
 }
 
 // ── Pasos siguientes ──────────────────────────────────────────────────────────
@@ -439,21 +653,29 @@ function confirmarInstalacion() {
 function printNextSteps() {
   console.log("=== LISTO ===");
   sep();
-  console.log("Iniciar Claude Code — los hooks y el MCP centinel ya están activos:");
+  console.log(
+    "Iniciar Claude Code — los hooks y el MCP centinel ya están activos:",
+  );
   console.log("  claude");
   sep();
   console.log("Para actualizar en el futuro:");
   console.log("  npx --yes github:sanvelasaez/claude-config");
   console.log("  (o desde Claude Code: /setup)");
   sep();
-  console.log("Para verificar el estado de la instalación en cualquier momento:");
+  console.log(
+    "Para verificar el estado de la instalación en cualquier momento:",
+  );
   console.log("  npx github:sanvelasaez/claude-config --check");
   sep();
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 
-const mode = check ? "VERIFICACION" : (force ? "INSTALACION FORZADA" : "INSTALACION");
+const mode = check
+  ? "VERIFICACION"
+  : force
+    ? "INSTALACION FORZADA"
+    : "INSTALACION";
 console.log(`=== CLAUDE CODE CONFIG — ${mode} ===`);
 sep();
 
@@ -470,7 +692,9 @@ if (check) {
   if (ok2) {
     console.log("Todo correcto. La instalacion esta completa y funcional.");
   } else {
-    console.log("Hay problemas con la instalacion. Ejecutar sin --check para reinstalar:");
+    console.log(
+      "Hay problemas con la instalacion. Ejecutar sin --check para reinstalar:",
+    );
     console.log("  npx --yes github:sanvelasaez/claude-config");
     process.exit(1);
   }
@@ -484,11 +708,17 @@ if (!confirmarInstalacion()) {
 sep();
 
 console.log(`2. ARCHIVOS → ${CLAUDE_DIR}`);
-if (!force) info("Los archivos existentes NO se sobreescriben (usa --force para actualizar)");
+if (!force)
+  info(
+    "Los archivos existentes NO se sobreescriben (usa --force para actualizar)",
+  );
 backupSettings();
 const stats = installFiles();
+fixPythonCommandInSettings();
 sep();
-info(`Resumen: ${stats.copied} nuevos, ${stats.updated} actualizados, ${stats.skipped} omitidos, ${stats.errors} errores`);
+info(
+  `Resumen: ${stats.copied} nuevos, ${stats.updated} actualizados, ${stats.skipped} omitidos, ${stats.errors} errores`,
+);
 sep();
 
 console.log("3. CENTINEL");

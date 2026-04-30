@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validar frontmatter de skills
+        run: node scripts/validate-skills.js
+
+      - name: Verificar instalador (modo --check con directorio vacío)
+        run: |
+          mkdir -p /tmp/claude-test
+          HOME=/tmp/claude-test node bin/install.js --check || true
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Verificar hook centinel con comando seguro
+        run: |
+          CLAUDE_TOOL_INPUT='{"command":"git status"}' python3 hooks/centinel_preflight.py
+          echo "Hook pasa comando seguro: OK"
+
+      - name: Verificar hook centinel bloquea destructivos
+        run: |
+          CLAUDE_TOOL_INPUT='{"command":"rm -rf /"}' python3 hooks/centinel_preflight.py && echo "ERROR: debería haber bloqueado" && exit 1 || echo "Hook bloquea rm -rf /: OK"

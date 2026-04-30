@@ -27,33 +27,41 @@
       "Write(src/**)",
       "Write(tests/**)",
       "Write(docs/**)",
+      "Write(.claude/**)",
       "Bash(npm install*)",
       "Bash(npm run*)",
       "Bash(npx *)",
       "Bash(node *)",
+      "Bash(python3 *)",
+      "Bash(python *)",
+      "Bash(pip install*)",
+      "Bash(pip3 install*)",
       "Bash(git status)",
       "Bash(git diff*)",
       "Bash(git log*)",
-      "Bash(git branch)"
+      "Bash(git branch)",
+      "Bash(git add*)",
+      "Bash(git stash*)",
+      "WebFetch(https://**)"
     ]
   },
   "hooks": {
     "PreToolUse": [
       {
         "matcher": "Bash",
-        "hooks": [{ "type": "command", "command": "node ~/.claude/hooks/centinel_preflight.js" }]
+        "hooks": [{ "type": "command", "command": "python3 ~/.claude/hooks/centinel_preflight.py" }]
       },
       {
         "matcher": "Write",
-        "hooks": [{ "type": "command", "command": "node ~/.claude/hooks/centinel_preflight.js" }]
+        "hooks": [{ "type": "command", "command": "python3 ~/.claude/hooks/centinel_preflight.py" }]
       },
       {
         "matcher": "Edit",
-        "hooks": [{ "type": "command", "command": "node ~/.claude/hooks/centinel_preflight.js" }]
+        "hooks": [{ "type": "command", "command": "python3 ~/.claude/hooks/centinel_preflight.py" }]
       },
       {
         "matcher": "WebFetch",
-        "hooks": [{ "type": "command", "command": "node ~/.claude/hooks/centinel_preflight.js" }]
+        "hooks": [{ "type": "command", "command": "python3 ~/.claude/hooks/centinel_preflight.py" }]
       }
     ],
     "PostToolUse": [

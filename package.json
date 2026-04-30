@@ -13,5 +13,9 @@
   },
   "engines": {
     "node": ">=18"
+  },
+  "scripts": {
+    "validate": "node scripts/validate-skills.js",
+    "check": "node bin/install.js --check"
   }
 }
