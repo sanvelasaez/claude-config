@@ -80,16 +80,22 @@ function ensureNode() {
   process.exit(1);
 }
 
-function checkClaudeCode() {
+function ensureClaudeCode() {
   const r = spawnSync(process.platform === "win32" ? "where" : "which", ["claude"], { encoding: "utf8" });
-  if (r.status === 0) ok("Claude Code — encontrado en PATH");
-  else warn("Claude Code — NO encontrado. Instalar: npm install -g @anthropic-ai/claude-code");
+  if (r.status === 0) { ok("Claude Code — encontrado en PATH"); return; }
+  warn("Claude Code — no encontrado. Instalando...");
+  const r2 = spawnSync("npm", ["install", "-g", "@anthropic-ai/claude-code"], { stdio: "inherit", encoding: "utf8" });
+  if (r2.status === 0) { ok("Claude Code instalado correctamente"); return; }
+  err("No se pudo instalar Claude Code. Instalar manualmente: npm install -g @anthropic-ai/claude-code");
 }
 
-function checkGit() {
+function ensureGit() {
   const r = spawnSync(process.platform === "win32" ? "where" : "which", ["git"], { encoding: "utf8" });
-  if (r.status === 0) ok("Git — encontrado en PATH");
-  else warn("Git — NO encontrado (opcional, requerido para git-workflow.md)");
+  if (r.status === 0) { ok("Git — encontrado en PATH"); return; }
+  warn("Git — no encontrado. Instalando...");
+  const installed = installPackage("Git.Git", "git", "git");
+  if (installed) { ok("Git instalado correctamente. Puede requerir reiniciar el terminal."); return; }
+  warn("No se pudo instalar Git automáticamente. Instalar desde: https://git-scm.com");
 }
 
 function getPythonCmd() {
@@ -114,7 +120,7 @@ function ensurePython() {
   if (checkPython()) return;
   info("Instalando Python 3...");
   const installed = installPackage("Python.Python.3", "python3", "python3");
-  if (installed && getPythonCmd()) { ok("Python 3 instalado correctamente"); return; }
+  if (installed) { ok("Python 3 instalado correctamente. Puede requerir reiniciar el terminal."); return; }
   err("No se pudo instalar Python 3 automáticamente. Instalar desde: https://www.python.org/downloads/");
 }
 
@@ -376,8 +382,8 @@ sep();
 
 console.log("1. REQUISITOS DE SISTEMA");
 ensureNode();
-checkClaudeCode();
-checkGit();
+ensureClaudeCode();
+ensureGit();
 ensurePython();
 sep();
 
