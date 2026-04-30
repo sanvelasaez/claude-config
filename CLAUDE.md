@@ -217,7 +217,7 @@ El estado de seguridad y origen de cada skill se mantiene en `SKILL-REGISTRY.md`
 | Prioridad | Skill | Descripción — trigger automático | Agente principal |
 |---|---|---|---|
 | 🔴 **1** | `centinel-auditor` | Auditar cualquier elemento de origen externo antes de instalarlo o usarlo: skills, MCP servers, dependencias, scripts, herramientas | todos |
-| 🔴 **2** | `skill-finder` | Buscar skills existentes cuando se necesita capacidad nueva para una tarea que ninguna skill actual cubre | sesión principal |
+| 🔴 **2** | `find-skills` | Descubrir e instalar skills cuando se necesita capacidad nueva: busca en skills.sh (leaderboard + CLI), GitHub y docs de Anthropic. Incluye auditoría centinel-auditor obligatoria antes de instalar | sesión principal |
 | 3 | `centinel-update` | Mantener actualizada la configuración de seguridad: IOCs, hooks, skills. Activar ante nuevas amenazas o cada 3 meses | sesión principal |
 | 4 | `code-review` | Revisar código en busca de bugs, problemas de seguridad y rendimiento antes de considerar cualquier implementación terminada | `@reviewer` |
 | 5 | `security-audit` | Auditar código que maneje datos sensibles, autenticación, autorización o credenciales | `@reviewer`, `@qa` |
@@ -228,7 +228,6 @@ El estado de seguridad y origen de cada skill se mantiene en `SKILL-REGISTRY.md`
 | 10 | `ui-design-review` | Revisar contraste, tipografía, espaciado, estados de componente y accesibilidad en interfaces frontend | `@designer` |
 | 11 | `perf-profiler` | Analizar rendimiento e identificar cuellos de botella cuando hay degradación observable | `@reviewer`, `@qa` |
 | 12 | `reflection` | Analizar el historial de la sesión para detectar errores, reglas no aplicadas y patrones a sistematizar | sesión principal |
-| 13 | `find-skills` | Descubrir e instalar skills del ecosistema skills.sh cuando se necesita una capacidad que ninguna skill actual cubre. Incluye auditoría centinel-auditor obligatoria antes de instalar cualquier skill encontrada | sesión principal |
 
 > Esta tabla es la fuente de verdad del estado de skills. Se actualiza al añadir o eliminar cualquier skill (ver regla de actualización automática).
 > El origen, seguridad y fechas de cada skill se registran en `SKILL-REGISTRY.md`.
@@ -242,10 +241,9 @@ El estado de seguridad y origen de cada skill se mantiene en `SKILL-REGISTRY.md`
 
 - `skills/centinel-auditor/SKILL.md` — auditoría de elementos externos: 7 pasos, multi-fuente, supply chain
 - `skills/centinel-update/SKILL.md` — mantenimiento de IOCs, hooks y skills; checklist trimestral
-- `skills/skill-finder/SKILL.md` — proceso de búsqueda en GitHub y docs de Anthropic + evaluación + registro
+- `skills/find-skills/SKILL.md` — descubrimiento en skills.sh + GitHub + Anthropic docs, con centinel-auditor integrado (fusión de skill-finder + vercel-labs/find-skills)
 - `skills/code-review/SKILL.md`, `skills/security-audit/SKILL.md`, `skills/test-writer/SKILL.md`, `skills/debug-tracer/SKILL.md`
 - `skills/arch-patterns/SKILL.md`, `skills/doc-writer/SKILL.md`, `skills/ui-design-review/SKILL.md`, `skills/perf-profiler/SKILL.md`, `skills/reflection/SKILL.md`
-- `skills/find-skills/SKILL.md` — descubrimiento de skills en skills.sh con centinel-auditor integrado (basada en vercel-labs/find-skills, modificada)
 
 ---
 
@@ -255,7 +253,7 @@ El estado de seguridad y origen de cada skill se mantiene en `SKILL-REGISTRY.md`
 ANTES de cada tarea, verificar internamente:
   1. ¿Existe una skill cuya descripción encaja con este contexto?
   2. Si SÍ  → cargar y aplicar la skill antes de proceder
-  3. Si NO  → activar skill-finder para buscar si existe algo adecuado
+  3. Si NO  → activar find-skills para buscar si existe algo adecuado
              → si no existe nada, proceder con criterio propio
              → al finalizar, valorar si debería crearse una skill para este patrón
 
@@ -595,11 +593,11 @@ Aplicar antes de considerar cualquier implementación terminada:
 ├── audit.log                          ← Generado por hook (PostToolUse Write — ruta del archivo)
 ├── skills/
 │   ├── centinel-auditor/
-│   │   └── SKILL.md                   ← INSTALAR PRIMERO (prioridad máxima)
+│   │   └── SKILL.md                   ← Prioridad 1 (auditoría de elementos externos)
+│   ├── find-skills/
+│   │   └── SKILL.md                   ← Prioridad 2 (descubrimiento de skills — fusión skill-finder + vercel-labs)
 │   ├── centinel-update/
-│   │   └── SKILL.md                   ← INSTALAR SEGUNDO (mantenimiento de seguridad)
-│   ├── skill-finder/
-│   │   └── SKILL.md                   ← INSTALAR TERCERO
+│   │   └── SKILL.md                   ← Prioridad 3 (mantenimiento de seguridad)
 │   ├── code-review/SKILL.md
 │   ├── security-audit/SKILL.md
 │   ├── test-writer/SKILL.md
@@ -608,9 +606,7 @@ Aplicar antes de considerar cualquier implementación terminada:
 │   ├── doc-writer/SKILL.md
 │   ├── ui-design-review/SKILL.md
 │   ├── perf-profiler/SKILL.md
-│   ├── reflection/SKILL.md
-│   └── find-skills/
-│       └── SKILL.md                   ← Descubrimiento en skills.sh (vercel-labs, modificada con centinel-auditor)
+│   └── reflection/SKILL.md
 ├── hooks/
 │   ├── centinel_preflight.js          ← Hook de bloqueo en tiempo real (Node.js, sin deps)
 │   └── centinel_iocs.json             ← Base de IOCs — actualizar con centinel-update

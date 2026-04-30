@@ -24,7 +24,6 @@
 |---|---|---|---|---|
 | `centinel-auditor` | Creación propia | 🔵 PROPIA | 2026-04 | Skill de seguridad base — prioridad máxima. Enriquecida con IOCs de MCP Sentinel |
 | `centinel-update` | Creación propia | 🔵 PROPIA | 2026-04 | Mantenimiento de IOCs, hooks y skills — checklist trimestral + respuesta a incidentes |
-| `skill-finder` | Creación propia | 🔵 PROPIA | 2026-04 | Búsqueda de skills — prioridad máxima |
 | `code-review` | Creación propia | 🔵 PROPIA | 2026-04 | Revisión de código pre-merge |
 | `security-audit` | Creación propia | 🔵 PROPIA | 2026-04 | Auditoría OWASP y autenticación |
 | `test-writer` | Creación propia | 🔵 PROPIA | 2026-04 | Generación de tests unitarios e integración |
@@ -34,7 +33,7 @@
 | `ui-design-review` | Creación propia | 🔵 PROPIA | 2026-04 | Revisión visual y accesibilidad WCAG |
 | `perf-profiler` | Creación propia | 🔵 PROPIA | 2026-04 | Análisis de rendimiento basado en métricas |
 | `reflection` | Creación propia | 🔵 PROPIA | 2026-04 | Análisis de sesión para mejora continua |
-| `find-skills` | Tercero: vercel-labs/skills (MIT) | 🟡 CONFIABLE | 2026-04-30 | SKILL.md original modificado: se eliminó `-y` y se añadió paso centinel-auditor obligatorio antes de instalar cualquier skill encontrada |
+| `find-skills` | Tercero: vercel-labs/skills (MIT) + Creación propia | 🟡 CONFIABLE | 2026-04-30 | Fusión de skill-finder (propia) + vercel-labs/find-skills. Traducida al español. Añade leaderboard skills.sh, CLI npx skills, criterios de calidad. centinel-auditor obligatorio antes de instalar. Sin flag -y. |
 
 ---
 
@@ -42,7 +41,7 @@
 
 | Nombre | Motivo | Fecha |
 |---|---|---|
-| — | — | — |
+| `skill-finder` | Fusionada en `find-skills` | 2026-04-30 |
 
 ---
 
