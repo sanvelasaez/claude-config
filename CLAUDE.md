@@ -228,6 +228,7 @@ El estado de seguridad y origen de cada skill se mantiene en `SKILL-REGISTRY.md`
 | 10 | `ui-design-review` | Revisar contraste, tipografía, espaciado, estados de componente y accesibilidad en interfaces frontend | `@designer` |
 | 11 | `perf-profiler` | Analizar rendimiento e identificar cuellos de botella cuando hay degradación observable | `@reviewer`, `@qa` |
 | 12 | `reflection` | Analizar el historial de la sesión para detectar errores, reglas no aplicadas y patrones a sistematizar | sesión principal |
+| 13 | `find-skills` | Descubrir e instalar skills del ecosistema skills.sh cuando se necesita una capacidad que ninguna skill actual cubre. Incluye auditoría centinel-auditor obligatoria antes de instalar cualquier skill encontrada | sesión principal |
 
 > Esta tabla es la fuente de verdad del estado de skills. Se actualiza al añadir o eliminar cualquier skill (ver regla de actualización automática).
 > El origen, seguridad y fechas de cada skill se registran en `SKILL-REGISTRY.md`.
@@ -239,11 +240,12 @@ El estado de seguridad y origen de cada skill se mantiene en `SKILL-REGISTRY.md`
 > El contenido completo de cada skill está en su archivo correspondiente dentro de `skills/`.
 > Esos archivos son la **fuente de verdad** — no mantener copias inline aquí.
 
-- `skills/centinel-auditor.md` — auditoría de elementos externos: 7 pasos, multi-fuente, supply chain
-- `skills/centinel-update.md` — mantenimiento de IOCs, hooks y skills; checklist trimestral
-- `skills/skill-finder.md` — proceso de búsqueda en GitHub y docs de Anthropic + evaluación + registro
-- `skills/code-review.md`, `security-audit.md`, `test-writer.md`, `debug-tracer.md`
-- `skills/arch-patterns.md`, `doc-writer.md`, `ui-design-review.md`, `perf-profiler.md`, `reflection.md`
+- `skills/centinel-auditor/SKILL.md` — auditoría de elementos externos: 7 pasos, multi-fuente, supply chain
+- `skills/centinel-update/SKILL.md` — mantenimiento de IOCs, hooks y skills; checklist trimestral
+- `skills/skill-finder/SKILL.md` — proceso de búsqueda en GitHub y docs de Anthropic + evaluación + registro
+- `skills/code-review/SKILL.md`, `skills/security-audit/SKILL.md`, `skills/test-writer/SKILL.md`, `skills/debug-tracer/SKILL.md`
+- `skills/arch-patterns/SKILL.md`, `skills/doc-writer/SKILL.md`, `skills/ui-design-review/SKILL.md`, `skills/perf-profiler/SKILL.md`, `skills/reflection/SKILL.md`
+- `skills/find-skills/SKILL.md` — descubrimiento de skills en skills.sh con centinel-auditor integrado (basada en vercel-labs/find-skills, modificada)
 
 ---
 
@@ -524,7 +526,7 @@ Los hooks de proyecto van en .claude/settings.json, nunca en el global.
 | `~/.claude/CLAUDE.md` | Instrucciones globales, filosofía, estándares, agentes, skills (este archivo) |
 | `~/.claude/settings.json` | Permisos globales, hooks globales |
 | `~/.claude/SKILL-REGISTRY.md` | Registro de skills instaladas: origen, seguridad, fechas, historial de auditorías |
-| `~/.claude/skills/` | Archivos .md de cada skill global |
+| `~/.claude/skills/` | Skills globales — cada una en su carpeta `<name>/SKILL.md` |
 | `~/.claude/agents/` | Archivos .md de cada subagente global |
 | `~/.claude/git-workflow.md` | Flujo Git — inactivo por defecto, activar por proyecto con `@~/.claude/git-workflow.md` |
 | `~/.claude/agent-coordination.md` | Coordinación multi-agente (.agent/, BACKLOG, TASKS, DECISIONS, BLOCKERS) — inactivo por defecto |
@@ -592,18 +594,23 @@ Aplicar antes de considerar cualquier implementación terminada:
 ├── sessions.log                       ← Generado por hook (SessionStart/End)
 ├── audit.log                          ← Generado por hook (PostToolUse Write — ruta del archivo)
 ├── skills/
-│   ├── centinel-auditor.md            ← INSTALAR PRIMERO (prioridad máxima)
-│   ├── centinel-update.md             ← INSTALAR SEGUNDO (mantenimiento de seguridad)
-│   ├── skill-finder.md                ← INSTALAR TERCERO
-│   ├── code-review.md
-│   ├── security-audit.md
-│   ├── test-writer.md
-│   ├── debug-tracer.md
-│   ├── arch-patterns.md
-│   ├── doc-writer.md
-│   ├── ui-design-review.md
-│   ├── perf-profiler.md
-│   └── reflection.md
+│   ├── centinel-auditor/
+│   │   └── SKILL.md                   ← INSTALAR PRIMERO (prioridad máxima)
+│   ├── centinel-update/
+│   │   └── SKILL.md                   ← INSTALAR SEGUNDO (mantenimiento de seguridad)
+│   ├── skill-finder/
+│   │   └── SKILL.md                   ← INSTALAR TERCERO
+│   ├── code-review/SKILL.md
+│   ├── security-audit/SKILL.md
+│   ├── test-writer/SKILL.md
+│   ├── debug-tracer/SKILL.md
+│   ├── arch-patterns/SKILL.md
+│   ├── doc-writer/SKILL.md
+│   ├── ui-design-review/SKILL.md
+│   ├── perf-profiler/SKILL.md
+│   ├── reflection/SKILL.md
+│   └── find-skills/
+│       └── SKILL.md                   ← Descubrimiento en skills.sh (vercel-labs, modificada con centinel-auditor)
 ├── hooks/
 │   ├── centinel_preflight.js          ← Hook de bloqueo en tiempo real (Node.js, sin deps)
 │   └── centinel_iocs.json             ← Base de IOCs — actualizar con centinel-update
