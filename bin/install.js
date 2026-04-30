@@ -166,6 +166,49 @@ function installFiles() {
   return stats;
 }
 
+// ── Configuración de hooks en settings.json ───────────────────────────────────
+
+/** Añade los hooks de centinel al settings.json existente si aún no están. */
+function ensureHookInSettings() {
+  const settingsPath = path.join(CLAUDE_DIR, "settings.json");
+  if (!fs.existsSync(settingsPath)) return;
+
+  let settings;
+  try { settings = JSON.parse(fs.readFileSync(settingsPath, "utf8")); }
+  catch { warn("settings.json no es JSON válido — hooks no configurados"); return; }
+
+  // Comprobar si algún hook de centinel ya está presente
+  const allEntries = Object.values(settings.hooks || {}).flat();
+  const tieneCentinel = allEntries.some((h) =>
+    (h.hooks || []).some((hh) => (hh.command || "").includes("centinel_preflight"))
+  );
+  if (tieneCentinel) { ok("settings.json — hooks centinel ya presentes"); return; }
+
+  // Leer la plantilla y mergear los hooks que falten
+  const templatePath = path.join(ROOT, "settings.json");
+  let template;
+  try { template = JSON.parse(fs.readFileSync(templatePath, "utf8")); }
+  catch { warn("settings.json de plantilla no encontrado — hooks no configurados"); return; }
+
+  settings.hooks = settings.hooks || {};
+  for (const [evento, entradas] of Object.entries(template.hooks || {})) {
+    settings.hooks[evento] = settings.hooks[evento] || [];
+    for (const entrada of entradas) {
+      const yaPresente = settings.hooks[evento].some(
+        (e) => JSON.stringify(e) === JSON.stringify(entrada)
+      );
+      if (!yaPresente) settings.hooks[evento].push(entrada);
+    }
+  }
+
+  try {
+    fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2), "utf8");
+    ok("settings.json — hooks centinel añadidos");
+  } catch (e) {
+    warn(`No se pudo actualizar settings.json: ${e.message}`);
+  }
+}
+
 // ── Configuración MCP en ~/.claude.json ───────────────────────────────────────
 
 function configureMcp() {
@@ -215,12 +258,12 @@ function checkSettingsJson() {
   const settingsPath = path.join(CLAUDE_DIR, "settings.json");
   try {
     const s = JSON.parse(fs.readFileSync(settingsPath, "utf8"));
-    const preHooks = (s.hooks || {}).PreToolUse || [];
-    const hasHook = preHooks.some((h) =>
-      (h.hooks || []).some((hh) => (hh.command || "").includes("centinel_preflight.js"))
+    const todasEntradas = Object.values(s.hooks || {}).flat();
+    const tieneHook = todasEntradas.some((h) =>
+      (h.hooks || []).some((hh) => (hh.command || "").includes("centinel_preflight"))
     );
-    if (hasHook) { ok("settings.json — hook centinel_preflight.js configurado"); return true; }
-    err("settings.json — no contiene el hook centinel_preflight.js");
+    if (tieneHook) { ok("settings.json — hook centinel_preflight configurado"); return true; }
+    err("settings.json — no contiene el hook centinel_preflight");
     return false;
   } catch (e) {
     err(`settings.json — no encontrado o JSON inválido: ${e.message}`);
@@ -407,7 +450,8 @@ sep();
 info(`Resumen: ${stats.copied} nuevos, ${stats.updated} actualizados, ${stats.skipped} omitidos, ${stats.errors} errores`);
 sep();
 
-console.log("3. MCP CENTINEL");
+console.log("3. CENTINEL");
+ensureHookInSettings();
 configureMcp();
 sep();
 
@@ -419,7 +463,7 @@ console.log("5. VERIFICACION FINAL");
 const installOk = runChecks();
 
 if (!installOk || stats.errors > 0) {
-  warn("La instalacion completó con errores. Revisar output arriba.");
+  warn("La instalacion completó con errores. Revisar la salida anterior.");
   process.exit(1);
 }
 
