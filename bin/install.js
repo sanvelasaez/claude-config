@@ -46,11 +46,38 @@ const check = args.includes("--check");
 
 // ── Requisitos de sistema ─────────────────────────────────────────────────────
 
-function checkNodeVersion() {
-  const [major] = process.versions.node.split(".").map(Number);
-  if (major >= 18) { ok(`Node.js ${process.versions.node} (requerido >= 18)`); return true; }
-  err(`Node.js ${process.versions.node} demasiado antiguo. Se necesita >= 18`);
+/** Instala un paquete usando el gestor disponible en la plataforma actual. */
+function installPackage(wingetId, brewId, aptId) {
+  if (process.platform === "win32") {
+    const r = spawnSync("winget", [
+      "install", "--id", wingetId, "--source", "winget",
+      "-e", "--accept-package-agreements", "--accept-source-agreements",
+    ], { stdio: "inherit", encoding: "utf8" });
+    return r.status === 0;
+  }
+  if (process.platform === "darwin") {
+    const r = spawnSync("brew", ["install", brewId], { stdio: "inherit", encoding: "utf8" });
+    return r.status === 0;
+  }
+  // Linux: probar apt-get, después dnf
+  for (const [mgr, arg] of [["apt-get", aptId], ["dnf", aptId]]) {
+    const r = spawnSync("sudo", [mgr, "install", "-y", arg], { stdio: "inherit", encoding: "utf8" });
+    if (r.status === 0) return true;
+  }
   return false;
+}
+
+function ensureNode() {
+  const [major] = process.versions.node.split(".").map(Number);
+  if (major >= 18) { ok(`Node.js ${process.versions.node} (>= 18)`); return; }
+  warn(`Node.js ${process.versions.node} demasiado antiguo. Se necesita >= 18. Actualizando...`);
+  const installed = installPackage("OpenJS.NodeJS.LTS", "node", "nodejs");
+  if (installed) {
+    ok("Node.js LTS instalado. Reinicia el terminal y ejecuta el instalador de nuevo.");
+    process.exit(0);
+  }
+  err("No se pudo instalar Node.js automáticamente. Instalar desde: https://nodejs.org");
+  process.exit(1);
 }
 
 function checkClaudeCode() {
@@ -63,6 +90,32 @@ function checkGit() {
   const r = spawnSync(process.platform === "win32" ? "where" : "which", ["git"], { encoding: "utf8" });
   if (r.status === 0) ok("Git — encontrado en PATH");
   else warn("Git — NO encontrado (opcional, requerido para git-workflow.md)");
+}
+
+function getPythonCmd() {
+  for (const cmd of ["python3", "python"]) {
+    const w = spawnSync(process.platform === "win32" ? "where" : "which", [cmd], { encoding: "utf8" });
+    if (w.status !== 0) continue;
+    const v = spawnSync(cmd, ["--version"], { encoding: "utf8" });
+    const ver = (v.stdout || v.stderr || "").trim();
+    if (/Python 3\./.test(ver)) return { cmd, ver };
+  }
+  return null;
+}
+
+function checkPython() {
+  const found = getPythonCmd();
+  if (found) { ok(`Python — ${found.ver} (${found.cmd})`); return true; }
+  warn("Python 3 — NO encontrado");
+  return false;
+}
+
+function ensurePython() {
+  if (checkPython()) return;
+  info("Instalando Python 3...");
+  const installed = installPackage("Python.Python.3", "python3", "python3");
+  if (installed && getPythonCmd()) { ok("Python 3 instalado correctamente"); return; }
+  err("No se pudo instalar Python 3 automáticamente. Instalar desde: https://www.python.org/downloads/");
 }
 
 // ── Copia de archivos ─────────────────────────────────────────────────────────
@@ -274,6 +327,10 @@ function checkMcpServer() {
 function runChecks() {
   let allOk = true;
 
+  console.log("  Dependencias del sistema");
+  allOk = checkPython() && allOk;
+  sep();
+
   console.log("  Archivos en ~/.claude/");
   allOk = checkFiles() && allOk;
   sep();
@@ -318,9 +375,10 @@ console.log(`=== CLAUDE CODE CONFIG — ${mode} ===`);
 sep();
 
 console.log("1. REQUISITOS DE SISTEMA");
-if (!checkNodeVersion()) process.exit(1);
+ensureNode();
 checkClaudeCode();
 checkGit();
+ensurePython();
 sep();
 
 if (check) {

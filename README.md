@@ -54,8 +54,11 @@ Comprueba: archivos instalados, hook configurado en `settings.json`, MCP configu
 
 ## Requisitos
 
-| Requisito | Versión | Para qué |
-|---|---|---|
-| Node.js | 18+ | Todo (instalador, hooks, MCP server) |
-| Claude Code | última | `npm install -g @anthropic-ai/claude-code` |
-| Git | cualquiera | Flujo git-workflow.md (opcional) |
+| Requisito | Versión | Para qué | Instalación automática |
+|---|---|---|---|
+| Node.js | 18+ | Todo (instalador, hooks, MCP server) | Sí — via winget / brew / apt |
+| Python | 3.x | Scripts de skills (ej. skill-creator) | Sí — via winget / brew / apt |
+| Claude Code | última | `npm install -g @anthropic-ai/claude-code` | No |
+| Git | cualquiera | Flujo git-workflow.md (opcional) | No |
+
+El instalador detecta automáticamente si Node.js o Python no están presentes y los instala usando el gestor de paquetes del sistema (winget en Windows, brew en macOS, apt/dnf en Linux).
