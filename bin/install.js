@@ -402,6 +402,17 @@ function runChecks() {
   return allOk;
 }
 
+// ── Backup de settings.json ───────────────────────────────────────────────────
+
+function backupSettings() {
+  const dst = path.join(CLAUDE_DIR, "settings.json");
+  const bak = path.join(CLAUDE_DIR, "settings.json.old");
+  if (!fs.existsSync(dst)) return;
+  if (fs.existsSync(bak)) fs.rmSync(bak);
+  fs.renameSync(dst, bak);
+  ok("settings.json existente guardado como settings.json.old");
+}
+
 // ── Confirmación interactiva ──────────────────────────────────────────────────
 
 function confirmarInstalacion() {
@@ -414,13 +425,13 @@ function confirmarInstalacion() {
     console.log("  Los archivos existentes se respetan; solo se añade lo que falta.");
   }
   sep();
-  process.stdout.write("  ¿Deseas continuar? [s/N]: ");
+  process.stdout.write("  ¿Deseas continuar? [S/n]: ");
 
   const buf = Buffer.alloc(16);
   let n = 0;
   try { n = fs.readSync(0, buf, 0, 16); } catch { return true; } // stdin no interactivo → continuar
   const respuesta = buf.slice(0, n).toString().trim().toLowerCase();
-  return respuesta === "s" || respuesta === "si" || respuesta === "sí";
+  return respuesta === "" || respuesta === "s" || respuesta === "si" || respuesta === "sí";
 }
 
 // ── Pasos siguientes ──────────────────────────────────────────────────────────
@@ -474,6 +485,7 @@ sep();
 
 console.log(`2. ARCHIVOS → ${CLAUDE_DIR}`);
 if (!force) info("Los archivos existentes NO se sobreescriben (usa --force para actualizar)");
+backupSettings();
 const stats = installFiles();
 sep();
 info(`Resumen: ${stats.copied} nuevos, ${stats.updated} actualizados, ${stats.skipped} omitidos, ${stats.errors} errores`);

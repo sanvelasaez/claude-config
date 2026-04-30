@@ -1,5 +1,6 @@
 {
   "_descripcion": "Configuración global de Claude Code. Copiar a ~/.claude/settings.json en cada instalación nueva.",
+  "language": "Español",
   "permissions": {
     "deny": [
       "Read(**/.env)",
