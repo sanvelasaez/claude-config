@@ -66,6 +66,7 @@ COPY_MAP = [
     ("agents",                  "agents"),
     ("hooks",                   "hooks"),
     ("mcps",                    "mcps"),
+    ("commands",                "commands"),
 ]
 
 
@@ -244,10 +245,16 @@ def print_next_steps() -> None:
     print("2. Iniciar una sesión de Claude Code y verificar que los hooks se disparan:")
     print("   claude")
     sep()
-    print("3. Para activar el flujo Git en un proyecto concreto, añadir a .claude/CLAUDE.md:")
+    print("3. Desde este momento puedes actualizar la configuración con un solo comando")
+    print("   dentro de cualquier sesión de Claude Code:")
+    print("   /setup")
+    print()
+    print("   Este slash command actualiza el repo, reinstala archivos y verifica el hook.")
+    sep()
+    print("4. Para activar el flujo Git en un proyecto concreto, añadir a .claude/CLAUDE.md:")
     print("   @~/.claude/git-workflow.md")
     sep()
-    print("4. Para ejecutar centinel-update periódicamente (cada ~3 meses) o tras un incidente,")
+    print("5. Para ejecutar centinel-update periódicamente (cada ~3 meses) o tras un incidente,")
     print("   invocar la skill en Claude Code: 'ejecuta centinel-update'")
     sep()
 

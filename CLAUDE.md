@@ -44,17 +44,29 @@ CAPA 3 — EXTENSIÓN (Skills + Hooks + MCP)
 > Al clonar este repositorio en un equipo nuevo, ejecutar `bootstrap.py` **antes de cualquier otra tarea**.
 > El script instala dependencias, copia los archivos a `~/.claude/` y verifica que todo funciona.
 
-### Instalación rápida (un comando)
+### Primera instalación (una sola vez)
 
 ```bash
-git clone https://github.com/sanvelasaez/claude-config.git
-cd claude-config
-python3 bootstrap.py
+git clone https://github.com/sanvelasaez/claude-config.git && python3 claude-config/bootstrap.py
 ```
 
-Para verificar sin instalar:
+Esto clona el repo, instala las dependencias Python, copia todos los archivos a `~/.claude/`
+y verifica que el hook funciona. Tras ejecutarlo, el slash command `/setup` queda disponible.
+
+### Actualizaciones futuras (desde Claude Code)
+
+Una vez instalado, cualquier actualización se hace con un solo comando dentro de Claude Code:
+
+```
+/setup
+```
+
+Este slash command actualiza el repo desde GitHub, reinstala los archivos con `--force`
+y verifica que todo sigue funcionando. No requiere salir de Claude Code.
+
+Para verificar sin instalar (útil para diagnosticar):
 ```bash
-python3 bootstrap.py --check
+python3 claude-config/bootstrap.py --check
 ```
 
 Para forzar la actualización de archivos ya existentes:
@@ -633,10 +645,14 @@ Aplicar antes de considerar cualquier implementación terminada:
 │   ├── debugger.md
 │   ├── qa.md
 │   └── designer.md
+├── commands/
+│   └── setup.md                       ← Slash command /setup — actualiza la config desde GitHub
 ├── git-workflow.md                    ← Flujo Git opcional — activar por proyecto
 └── agent-coordination.md              ← Coordinación multi-agente opcional — activar por proyecto
 
-[En este repositorio — plantillas para configuración de proyectos]
+[En este repositorio — bootstrap y plantillas]
+bootstrap.py                           ← Instalador automático (primera instalación)
+requirements.txt                       ← Dependencias Python (mcp>=1.0.0)
 templates/
 ├── project-claude.md                  ← Copiar a .claude/CLAUDE.md del proyecto y rellenar
 └── project-settings.json              ← Copiar a .claude/settings.json del proyecto y ajustar
