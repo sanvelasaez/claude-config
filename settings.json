@@ -29,8 +29,6 @@
       "Bash(npm install*)",
       "Bash(npm run*)",
       "Bash(npx *)",
-      "Bash(pip install*)",
-      "Bash(python *)",
       "Bash(node *)",
       "Bash(git status)",
       "Bash(git diff*)",
@@ -42,39 +40,19 @@
     "PreToolUse": [
       {
         "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ~/.claude/hooks/centinel_preflight.py"
-          }
-        ]
+        "hooks": [{ "type": "command", "command": "node ~/.claude/hooks/centinel_preflight.js" }]
       },
       {
         "matcher": "Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ~/.claude/hooks/centinel_preflight.py"
-          }
-        ]
+        "hooks": [{ "type": "command", "command": "node ~/.claude/hooks/centinel_preflight.js" }]
       },
       {
         "matcher": "Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ~/.claude/hooks/centinel_preflight.py"
-          }
-        ]
+        "hooks": [{ "type": "command", "command": "node ~/.claude/hooks/centinel_preflight.js" }]
       },
       {
         "matcher": "WebFetch",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ~/.claude/hooks/centinel_preflight.py"
-          }
-        ]
+        "hooks": [{ "type": "command", "command": "node ~/.claude/hooks/centinel_preflight.js" }]
       }
     ],
     "PostToolUse": [
@@ -83,7 +61,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 -c \"\nimport sys, json, os\nfrom datetime import datetime\ntry:\n    raw = os.environ.get('CLAUDE_TOOL_INPUT', '{}')\n    file_path = json.loads(raw).get('file_path', 'unknown')\n    log_line = f'[{datetime.now().strftime(\"%Y-%m-%d %H:%M:%S\")}] WRITE: {file_path}'\n    log_path = os.path.expanduser('~/.claude/audit.log')\n    with open(log_path, 'a', encoding='utf-8') as f:\n        f.write(log_line + '\\n')\nexcept Exception:\n    pass\n\""
+            "command": "node -e \"try{const fs=require('fs'),path=require('path'),os=require('os');const fp=JSON.parse(process.env.CLAUDE_TOOL_INPUT||'{}').file_path||'?';const line='['+new Date().toISOString().slice(0,19).replace('T',' ')+'] WRITE: '+fp;fs.appendFileSync(path.join(os.homedir(),'.claude','audit.log'),line+'\\n')}catch(e){}\""
           }
         ]
       }
@@ -93,7 +71,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 -c \"\nimport os\nfrom datetime import datetime\ntry:\n    log_line = f'[{datetime.now().strftime(\"%Y-%m-%d %H:%M:%S\")}] SESSION START — dir: {os.getcwd()}'\n    log_path = os.path.expanduser('~/.claude/sessions.log')\n    with open(log_path, 'a', encoding='utf-8') as f:\n        f.write(log_line + '\\n')\nexcept Exception:\n    pass\n\""
+            "command": "node -e \"try{const fs=require('fs'),path=require('path'),os=require('os');const line='['+new Date().toISOString().slice(0,19).replace('T',' ')+'] SESSION START - dir: '+process.cwd();fs.appendFileSync(path.join(os.homedir(),'.claude','sessions.log'),line+'\\n')}catch(e){}\""
           }
         ]
       }
@@ -103,7 +81,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 -c \"\nimport os\nfrom datetime import datetime\ntry:\n    log_line = f'[{datetime.now().strftime(\"%Y-%m-%d %H:%M:%S\")}] SESSION END'\n    log_path = os.path.expanduser('~/.claude/sessions.log')\n    with open(log_path, 'a', encoding='utf-8') as f:\n        f.write(log_line + '\\n')\nexcept Exception:\n    pass\n\""
+            "command": "node -e \"try{const fs=require('fs'),path=require('path'),os=require('os');const line='['+new Date().toISOString().slice(0,19).replace('T',' ')+'] SESSION END';fs.appendFileSync(path.join(os.homedir(),'.claude','sessions.log'),line+'\\n')}catch(e){}\""
           }
         ]
       }

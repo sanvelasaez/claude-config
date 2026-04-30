@@ -1,0 +1,17 @@
+{
+  "name": "claude-global-config",
+  "version": "1.0.0",
+  "description": "Configuración global de Claude Code — instalador automático",
+  "keywords": ["claude", "claude-code", "anthropic"],
+  "homepage": "https://github.com/sanvelasaez/claude-config",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sanvelasaez/claude-config.git"
+  },
+  "bin": {
+    "claude-global-config": "./bin/install.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

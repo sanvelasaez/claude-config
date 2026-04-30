@@ -77,8 +77,8 @@ Si no lo detecta: revisar la regex o el tipo de IOC seleccionado.
 ### 6. ACTUALIZAR SKILL O HOOK SI ES NECESARIO
 
 Si el patrón es demasiado complejo para una regex en JSON:
-- Añadir lógica a `centinel_preflight.py` como comprobación explícita
-- Seguir el patrón de las funciones `check_bash`, `check_write`, `check_web_fetch`
+- Añadir lógica a `centinel_preflight.js` como comprobación explícita
+- Seguir el patrón de las funciones `checkBash`, `checkWrite`, `checkWebFetch`
 
 Si la amenaza requiere análisis de reputación o contexto semántico (no regex):
 - Actualizar el proceso en `centinel-auditor.md` con el nuevo paso o criterio

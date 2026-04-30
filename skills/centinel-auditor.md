@@ -8,7 +8,7 @@ description: Auditar cualquier elemento de origen externo antes de instalarlo o 
 Cualquier elemento externo: skills, MCP servers, dependencias (npm/pip/cargo/gems/pub),
 scripts de instalación, herramientas CLI, plugins, extensiones, repositorios de terceros.
 
-> El hook `centinel_preflight.py` actúa en tiempo real de forma automática.
+> El hook `centinel_preflight.js` actúa en tiempo real de forma automática.
 > Esta skill guía el análisis manual profundo cuando el hook no puede aplicar.
 
 ---
@@ -98,7 +98,7 @@ Señales de alerta específicas de ataques a la cadena de suministro:
 
 ## Separación de responsabilidades
 
-| Qué hace `centinel_preflight.py` (hook automático) | Qué hace esta skill (análisis manual) |
+| Qué hace `centinel_preflight.js` (hook automático) | Qué hace esta skill (análisis manual) |
 |---|---|
 | Bloquea comandos destructivos en tiempo real | Audita reputación y código de elementos externos |
 | Detecta exfiltración en URLs/comandos en tiempo real | Investiga en fuentes de seguridad (Advisory DB, OSV) |

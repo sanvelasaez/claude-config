@@ -41,17 +41,15 @@ CAPA 3 — EXTENSIÓN (Skills + Hooks + MCP)
 
 ## 🚀 BOOTSTRAP — Instalación en sistema nuevo
 
-> Al clonar este repositorio en un equipo nuevo, ejecutar `bootstrap.py` **antes de cualquier otra tarea**.
-> El script instala dependencias, copia los archivos a `~/.claude/` y verifica que todo funciona.
-
-### Primera instalación (una sola vez)
+### Primera instalación — un solo comando
 
 ```bash
-git clone https://github.com/sanvelasaez/claude-config.git && python3 claude-config/bootstrap.py
+npx github:sanvelasaez/claude-config
 ```
 
-Esto clona el repo, instala las dependencias Python, copia todos los archivos a `~/.claude/`
-y verifica que el hook funciona. Tras ejecutarlo, el slash command `/setup` queda disponible.
+Descarga el repositorio desde GitHub vía npm, copia todos los archivos a `~/.claude/`
+y verifica que el hook funciona. **Solo requiere Node.js 18+**, que ya viene incluido con Claude Code.
+No es necesario clonar el repo ni instalar nada previamente.
 
 ### Actualizaciones futuras (desde Claude Code)
 
@@ -61,17 +59,14 @@ Una vez instalado, cualquier actualización se hace con un solo comando dentro d
 /setup
 ```
 
-Este slash command actualiza el repo desde GitHub, reinstala los archivos con `--force`
-y verifica que todo sigue funcionando. No requiere salir de Claude Code.
+O directamente desde la terminal:
+```bash
+npx --yes github:sanvelasaez/claude-config
+```
 
 Para verificar sin instalar (útil para diagnosticar):
 ```bash
-python3 claude-config/bootstrap.py --check
-```
-
-Para forzar la actualización de archivos ya existentes:
-```bash
-python3 bootstrap.py --force
+npx github:sanvelasaez/claude-config -- --check
 ```
 
 ---
@@ -80,44 +75,23 @@ python3 bootstrap.py --force
 
 | Dependencia | Versión mínima | Requerida para | Cómo instalar |
 |---|---|---|---|
-| **Python** | 3.9+ | Hooks (`centinel_preflight.py`) y MCP server | https://python.org |
-| **pip** | cualquiera | Instalar paquetes Python | viene con Python |
+| **Node.js** | 18+ | Instalador `npx`, hooks y MCP server | https://nodejs.org |
+| **npm** | viene con Node | `npx` y MCPs | viene con Node.js |
 | **Claude Code** | última | Todo | `npm install -g @anthropic-ai/claude-code` |
-| Node.js | 18+ | MCPs con `npx` (filesystem, github…) | https://nodejs.org |
-| npm | viene con Node | MCPs con `npx` | viene con Node.js |
 | Git | cualquiera | Flujo `git-workflow.md` | https://git-scm.com |
 
-> **Solo Python y Claude Code son estrictamente necesarios.** Node.js y Git son opcionales según el uso.
+> **Node.js es el único requisito.** Claude Code ya lo incluye, así que si Claude Code está instalado, todo está cubierto.
 
-### Dependencias Python
+### Después de la instalación
 
-El script instala automáticamente todo lo que hay en `requirements.txt`:
+El instalador lo configura todo automáticamente, incluido el MCP centinel en `~/.claude.json`.
+Solo queda verificar que funciona e iniciar Claude Code:
 
-| Paquete | Versión | Para qué | Instalación manual |
-|---|---|---|---|
-| `mcp` | >=1.0.0 | MCP server `mcps/centinel-server.py` | `pip install mcp` |
-
-### Pasos post-instalación (manuales)
-
-Tras ejecutar `bootstrap.py`, el script indica estos pasos:
-
-**1. Activar el MCP centinel** — añadir a `~/.claude.json`:
-```json
-{
-  "mcpServers": {
-    "centinel": {
-      "command": "python3",
-      "args": ["~/.claude/mcps/centinel-server.py"]
-    }
-  }
-}
+```bash
+claude
 ```
 
-**2. Verificar en Claude Code** — iniciar una sesión y confirmar que:
-- Los hooks se ejecutan (intentar un comando bloqueado y ver el mensaje `[CENTINEL] BLOQUEADO`)
-- El MCP centinel aparece disponible en la sesión
-
-**3. Activar flujos opcionales por proyecto** — en `.claude/CLAUDE.md` del proyecto:
+**Activar flujos opcionales por proyecto** — en `.claude/CLAUDE.md` del proyecto:
 ```
 @~/.claude/git-workflow.md          ← si el proyecto usa Git workflow
 @~/.claude/agent-coordination.md   ← si el proyecto usa múltiples agentes
@@ -125,19 +99,18 @@ Tras ejecutar `bootstrap.py`, el script indica estos pasos:
 
 ---
 
-### Qué hace bootstrap.py exactamente
+### Qué hace el instalador exactamente
 
 ```
-1. Verifica Python >= 3.9
+1. Verifica Node.js >= 18
 2. Verifica Claude Code en PATH (avisa si no está)
-3. Verifica Node.js, npm, Git (avisa si no están, no bloquea)
-4. Instala paquetes pip de requirements.txt si faltan
-5. Copia skills/, agents/, hooks/, mcps/ → ~/.claude/
-6. Copia CLAUDE.md, settings.json, SKILL-REGISTRY.md → ~/.claude/
-7. Copia git-workflow.md, agent-coordination.md → ~/.claude/
-8. En Unix/Mac: hace ejecutable hooks/centinel_preflight.py
-9. Verifica el hook: comando seguro pasa, rm -rf / queda bloqueado
-10. Muestra los pasos manuales restantes
+3. Verifica Git (avisa si no está, no bloquea)
+4. Copia skills/, agents/, hooks/, mcps/ → ~/.claude/
+5. Copia CLAUDE.md, settings.json, SKILL-REGISTRY.md → ~/.claude/
+6. Copia git-workflow.md, agent-coordination.md → ~/.claude/
+7. En Unix/Mac: hace ejecutable hooks/centinel_preflight.js
+8. Verifica el hook: comando seguro pasa, rm -rf / queda bloqueado
+9. Muestra los pasos manuales restantes
 ```
 
 > Si algún archivo ya existe, **no lo sobreescribe** (usa `--force` para actualizar).
@@ -190,12 +163,12 @@ Además, añadir los permisos necesarios en `.claude/settings.json` del proyecto
 
 ### Guía de instalación completa (ejecutar en instalación nueva)
 
-**Paso 0 — Ejecutar bootstrap.py**
-Este script instala todo automáticamente (ver sección Bootstrap al inicio de este archivo):
+**Paso 0 — Instalar con npx**
+El instalador copia todo automáticamente (ver sección Bootstrap al inicio de este archivo):
 ```bash
-python3 bootstrap.py
+npx github:sanvelasaez/claude-config
 ```
-> Si algún archivo ya existe, no lo sobreescribe. Para actualizar: `python3 bootstrap.py --force`
+> Si algún archivo ya existe, no lo sobreescribe. Para actualizar: `npx --yes github:sanvelasaez/claude-config`
 
 **Paso 1 — Verificar las skills de prioridad máxima**
 Tras el bootstrap, confirmar que existen en `~/.claude/skills/`:
@@ -362,21 +335,21 @@ Cuando la sesión principal coordina más de un subagente simultáneamente, acti
 {
   "mcpServers": {
     "centinel": {
-      "command": "python3",
-      "args": ["~/.claude/mcps/centinel-server.py"]
+      "command": "node",
+      "args": ["~/.claude/mcps/centinel-server.js"]
     }
   }
 }
 ```
 
-> Requiere `pip install mcp` una sola vez. Solo consulta OSV.dev y GitHub Advisory (sin auth).
+> Solo requiere Node.js (sin dependencias adicionales). Solo consulta OSV.dev y GitHub Advisory (sin auth).
 > Herramientas disponibles: `scan_package`, `check_ioc`, `add_ioc`, `ioc_stats`.
 
 **Filesystem** puede añadirse si se trabaja en múltiples proyectos y se necesita acceso por MCP:
 ```json
 {
   "mcpServers": {
-    "centinel": { "command": "python3", "args": ["~/.claude/mcps/centinel-server.py"] },
+    "centinel": { "command": "node", "args": ["~/.claude/mcps/centinel-server.js"] },
     "filesystem": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-filesystem", "/home/user/projects"]
@@ -497,8 +470,6 @@ Los hooks de proyecto van en .claude/settings.json, nunca en el global.
       "Bash(npm install*)",
       "Bash(npm run*)",
       "Bash(npx *)",
-      "Bash(pip install*)",
-      "Bash(python *)",
       "Bash(node *)",
       "Bash(git status)",
       "Bash(git diff*)",
@@ -634,10 +605,10 @@ Aplicar antes de considerar cualquier implementación terminada:
 │   ├── perf-profiler.md
 │   └── reflection.md
 ├── hooks/
-│   ├── centinel_preflight.py          ← Hook de bloqueo en tiempo real
+│   ├── centinel_preflight.js          ← Hook de bloqueo en tiempo real (Node.js, sin deps)
 │   └── centinel_iocs.json             ← Base de IOCs — actualizar con centinel-update
 ├── mcps/
-│   └── centinel-server.py             ← MCP server de enriquecimiento (requiere: pip install mcp)
+│   └── centinel-server.js             ← MCP server de enriquecimiento (Node.js, sin deps)
 ├── agents/
 │   ├── explorer.md
 │   ├── architect.md
@@ -650,9 +621,10 @@ Aplicar antes de considerar cualquier implementación terminada:
 ├── git-workflow.md                    ← Flujo Git opcional — activar por proyecto
 └── agent-coordination.md              ← Coordinación multi-agente opcional — activar por proyecto
 
-[En este repositorio — bootstrap y plantillas]
-bootstrap.py                           ← Instalador automático (primera instalación)
-requirements.txt                       ← Dependencias Python (mcp>=1.0.0)
+[En este repositorio — instalador y plantillas]
+package.json                           ← Descriptor npm (habilita npx github:sanvelasaez/claude-config)
+bin/install.js                         ← Instalador Node.js — copia archivos a ~/.claude/ y verifica el hook
+README.md                              ← Documentación e instrucciones de instalación
 templates/
 ├── project-claude.md                  ← Copiar a .claude/CLAUDE.md del proyecto y rellenar
 └── project-settings.json              ← Copiar a .claude/settings.json del proyecto y ajustar
