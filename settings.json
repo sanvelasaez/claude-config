@@ -1,4 +1,4 @@
-{
+﻿{
   "_descripcion": "Configuración global de Claude Code. Copiar a ~/.claude/settings.json en cada instalación nueva.",
   "language": "Español",
   "permissions": {
@@ -16,11 +16,10 @@
       "Bash(sudo rm *)",
       "Bash(curl * | bash)",
       "Bash(wget * | sh)",
-      "Bash(git push*)",
-      "Bash(git commit*)",
-      "Bash(git merge*)",
-      "Bash(git rebase*)",
-      "Bash(git reset --hard*)"
+      "PowerShell(Remove-Item*-Recurse*)",
+      "PowerShell(Invoke-Expression *)",
+      "PowerShell(iex *)",
+      "PowerShell(Format-Volume*)"
     ],
     "allow": [
       "Read(**)",
@@ -39,29 +38,60 @@
       "Bash(git status)",
       "Bash(git diff*)",
       "Bash(git log*)",
-      "Bash(git branch)",
-      "Bash(git add*)",
-      "Bash(git stash*)",
-      "WebFetch(https://**)"
+      "WebFetch(https://**)",
+      "PowerShell(npm *)",
+      "PowerShell(node *)",
+      "PowerShell(python3 *)",
+      "PowerShell(python *)",
+      "PowerShell(pip *)"
     ]
   },
   "hooks": {
     "PreToolUse": [
       {
         "matcher": "Bash",
-        "hooks": [{ "type": "command", "command": "python3 ~/.claude/hooks/centinel_preflight.py" }]
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/centinel_preflight.py"
+          }
+        ]
+      },
+      {
+        "matcher": "PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/centinel_preflight.py"
+          }
+        ]
       },
       {
         "matcher": "Write",
-        "hooks": [{ "type": "command", "command": "python3 ~/.claude/hooks/centinel_preflight.py" }]
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/centinel_preflight.py"
+          }
+        ]
       },
       {
         "matcher": "Edit",
-        "hooks": [{ "type": "command", "command": "python3 ~/.claude/hooks/centinel_preflight.py" }]
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/centinel_preflight.py"
+          }
+        ]
       },
       {
         "matcher": "WebFetch",
-        "hooks": [{ "type": "command", "command": "python3 ~/.claude/hooks/centinel_preflight.py" }]
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/centinel_preflight.py"
+          }
+        ]
       }
     ],
     "PostToolUse": [
