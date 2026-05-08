@@ -16,6 +16,12 @@
   },
   "scripts": {
     "validate": "node scripts/validate-skills.js",
-    "check": "node bin/install.js --check"
+    "check": "node bin/install.js --check",
+    "update-skills": "node scripts/update-skills.js",
+    "update-skills:check": "node scripts/update-skills.js --check",
+    "update-skills:own": "node scripts/update-skills.js --own",
+    "update-skills:external": "node scripts/update-skills.js --external",
+    "merge-skills": "node scripts/merge-skill-extension.js --all",
+    "merge-skill": "node scripts/merge-skill-extension.js"
   }
 }

@@ -1,0 +1,49 @@
+{
+  "_description": "Fuente de verdad de skills externas (terceros). Para skills propias (🔵), la fuente de verdad es el config repo. Actualizar este archivo cada vez que se instale o desinstale una skill externa.",
+  "_repo": "github:sanvelasaez/claude-config",
+  "_update_repo_command": "npx --yes github:sanvelasaez/claude-config",
+
+  "repo_skills": [
+    "centinel-auditor",
+    "centinel-update",
+    "code-review",
+    "security-audit",
+    "test-writer",
+    "debug-tracer",
+    "arch-patterns",
+    "doc-writer",
+    "ui-design-review",
+    "perf-profiler",
+    "reflection"
+  ],
+
+  "external_skills": [
+    {
+      "name": "find-skills",
+      "repo": "vercel-labs/skills",
+      "install_command": "npx skills add vercel-labs/skills@find-skills -g",
+      "security_level": "CONFIABLE",
+      "installed_date": "2026-04-30",
+      "requires_centinel_audit_before_update": false,
+      "notes": "Skill de descubrimiento del ecosistema skills.sh. Tiene extensión en el repo (SKILL.ext.md) que se aplica automáticamente tras la instalación."
+    },
+    {
+      "name": "skill-creator",
+      "repo": "anthropics/skills",
+      "install_command": "npx skills add anthropics/skills@skill-creator -g -y",
+      "security_level": "VERIFICADA",
+      "installed_date": "2026-04-30",
+      "requires_centinel_audit_before_update": false,
+      "notes": "Skill oficial de Anthropic para crear y mejorar skills. Apache 2.0. 177K installs."
+    },
+    {
+      "name": "owasp-security",
+      "repo": "agamm/claude-code-owasp",
+      "install_command": "npx skills add agamm/claude-code-owasp -g -y",
+      "security_level": "CONFIABLE",
+      "installed_date": "2026-05-06",
+      "requires_centinel_audit_before_update": true,
+      "notes": "OWASP Top 10:2025, ASVS 5.0, LLM Top 10:2025, Agentic AI Security 2026. Solo SKILL.md, sin binarios ni scripts."
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # claude-config
 
-Configuración global de Claude Code lista para usar. Instala un sistema de seguridad en tiempo real, skills reutilizables, agentes especializados y hooks de auditoría.
+Configuración global de Claude Code lista para usar. Un solo comando instala un sistema de seguridad en tiempo real, skills reutilizables, agentes especializados, hooks de auditoría y un sistema de extensiones para skills de terceros.
 
 ## Instalación
 
@@ -10,7 +10,7 @@ Un solo comando. Solo requiere Node.js 18+ (que ya viene con Claude Code):
 npx github:sanvelasaez/claude-config
 ```
 
-Esto copia todos los archivos a `~/.claude/`, configura el MCP centinel en `~/.claude.json` y verifica que el sistema funciona. No hay pasos adicionales.
+Copia todos los archivos a `~/.claude/`, configura el MCP centinel en `~/.claude.json` y verifica que el sistema funciona. No hay pasos adicionales.
 
 Para actualizar en el futuro:
 
@@ -24,41 +24,111 @@ O desde dentro de Claude Code:
 /setup
 ```
 
-Para verificar que todo está funcionando correctamente (sin instalar nada):
+Para verificar sin instalar nada:
 
 ```bash
 npx github:sanvelasaez/claude-config --check
 ```
 
-Comprueba: archivos instalados, hook configurado en `settings.json`, MCP configurado en `~/.claude.json`, que el hook bloquea comandos peligrosos y permite los seguros, y que el MCP server responde al protocolo MCP.
-
 ## Qué incluye
 
-**Sistema de seguridad Centinel**
-- Hook en tiempo real que bloquea comandos destructivos, exfiltración de datos y prompt injection antes de que se ejecuten
-- MCP server que consulta OSV.dev para detectar vulnerabilidades en dependencias
-- Base de IOCs (Indicators of Compromise) actualizable
+### Sistema de seguridad Centinel
 
-**Skills**
-- `centinel-auditor` — audita cualquier elemento externo antes de instalarlo
-- `centinel-update` — mantiene actualizada la base de IOCs
-- `code-review`, `security-audit`, `test-writer`, `debug-tracer`
-- `arch-patterns`, `doc-writer`, `ui-design-review`, `perf-profiler`, `reflection`
+Tres capas que trabajan juntas:
 
-**Agentes especializados**
-- `@explorer`, `@architect`, `@reviewer`, `@debugger`, `@qa`, `@designer`
+- **Hook `centinel_preflight.py`** — se ejecuta antes de cada herramienta. Bloquea comandos destructivos (`rm -rf`, `git reset --hard`…), URLs de exfiltración (pastebin, requestbin…) y patrones de prompt injection. Configurable via `hooks/centinel_iocs.json`.
+- **MCP server `centinel-server.py`** — expone cuatro herramientas a Claude: `scan_package` (consulta OSV.dev), `check_ioc`, `add_ioc` e `ioc_stats`. Permite auditar dependencias npm/pypi/cargo/go antes de instalar.
+- **Skill `centinel-auditor`** — proceso de 7 pasos para auditar cualquier elemento externo (skills, MCPs, paquetes, scripts) antes de instalarlo o usarlo.
 
-**Flujos opcionales** (activar por proyecto)
-- `git-workflow.md` — flujo Git con commits, PRs y revisiones
-- `agent-coordination.md` — coordinación multi-agente
+### Skills
+
+13 skills organizadas por prioridad y cargadas automáticamente cuando el contexto lo requiere:
+
+| Prioridad | Skill | Cuándo se activa |
+|---|---|---|
+| 1 | `centinel-auditor` | Cualquier elemento de origen externo |
+| 2 | `find-skills` | Buscar o instalar skills nuevas |
+| 3 | `centinel-update` | Mantenimiento trimestral de IOCs |
+| 4 | `code-review` | Antes de considerar una implementación terminada |
+| 5 | `security-audit` | Código con autenticación, credenciales o datos sensibles |
+| 6 | `test-writer` | Código nuevo o modificado sin cobertura |
+| 7 | `debug-tracer` | Bugs no obvios o errores intermitentes |
+| 8 | `arch-patterns` | Diseño de módulos o refactorizaciones estructurales |
+| 9 | `doc-writer` | APIs públicas o lógica no obvia |
+| 10 | `ui-design-review` | Interfaces frontend |
+| 11 | `perf-profiler` | Degradación de rendimiento observable |
+| 12 | `reflection` | Análisis de sesión para mejora continua |
+| 13 | `skill-creator` | Crear o mejorar skills |
+
+Más información en @SKILL-REGISTRY.md
+
+### Agentes especializados
+
+Seis subagentes con modelos y skills asignadas. La sesión principal los delega automáticamente:
+
+- `@explorer` — mapear codebases desconocidos (Haiku, sin contaminar contexto principal)
+- `@architect` — decisiones de arquitectura y patrones de diseño
+- `@reviewer` — code review exhaustivo + auditoría de seguridad + rendimiento
+- `@debugger` — análisis sistemático de hipótesis para bugs complejos
+- `@qa` — validación funcional + tests + centinel-auditor
+- `@designer` — diseño visual, sistemas de diseño, accesibilidad WCAG
+
+### Sistema de extensiones para skills de terceros
+
+Las skills de terceros se instalan limpias (sin modificar). Las personalizaciones van en archivos de extensión separados que se mergean al regenerar:
+
+```
+skills/<nombre>/
+├── SKILL.base.md   ← original o traducción fiel (no tocar)
+├── SKILL.ext.md    ← nuestras adiciones con directivas EXT:
+└── SKILL.md        ← archivo activo generado por merge
+```
+
+Directivas disponibles: `FRONTMATTER`, `INJECT_AFTER`, `INJECT_BEFORE`, `REPLACE_SECTION`, `APPEND`.
+
+```bash
+npm run merge-skills              # regenera todos los SKILL.md
+npm run merge-skills:find-skills  # solo una skill concreta
+```
+
+Skills actualmente extendidas: `find-skills` (vercel-labs, +4 extensiones), `skill-creator` (Anthropic, traducción como base).
+
+### Mantenimiento de skills
+
+Un solo script mantiene actualizadas todas las skills:
+
+```bash
+npm run update-skills          # actualiza todo (config repo + skills externas)
+npm run update-skills:check    # dry-run, muestra qué cambiaría
+npm run update-skills:own      # solo skills del config repo
+npm run update-skills:external # solo skills de terceros (+ merge automático)
+```
+
+El script lee `scripts/skills-manifest.json` para saber qué skills vienen de este repo y cuáles de terceros. Para skills externas, aplica las extensiones automáticamente tras reinstalar.
+
+### Flujos opcionales (activar por proyecto)
+
+En `.claude/CLAUDE.md` del proyecto:
+
+```markdown
+@~/.claude/git-workflow.md        ← flujo Git con commits, PRs y revisiones
+@~/.claude/agent-coordination.md  ← coordinación multi-agente avanzada
+```
+
+### Hooks de sesión
+
+Además del hook de seguridad, el `settings.json` incluye hooks para auditoría y logging:
+
+- `PostToolUse Write/Edit` — registra cada archivo modificado en `~/.claude/audit.log`
+- `SessionStart` — registra inicio de sesión en `~/.claude/sessions.log`
 
 ## Requisitos
 
 | Requisito | Versión | Para qué | Instalación automática |
 |---|---|---|---|
-| Node.js | 18+ | Todo (instalador, hooks, MCP server) | Sí — via winget / brew / apt |
-| Python | 3.x | Scripts de skills (ej. skill-creator) | Sí — via winget / brew / apt |
-| Claude Code | última | `npm install -g @anthropic-ai/claude-code` | No |
+| Node.js | 18+ | Instalador `npx` | Sí — winget / brew / apt |
+| Python | 3.x | Hook centinel, MCP server | Sí — winget / brew / apt |
+| Claude Code | última | Todo | No — `npm install -g @anthropic-ai/claude-code` |
 | Git | cualquiera | Flujo git-workflow.md (opcional) | No |
 
-El instalador detecta automáticamente si Node.js o Python no están presentes y los instala usando el gestor de paquetes del sistema (winget en Windows, brew en macOS, apt/dnf en Linux).
+El instalador detecta automáticamente si Node.js o Python no están y los instala usando el gestor de paquetes del sistema.
