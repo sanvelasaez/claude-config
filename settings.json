@@ -27,6 +27,7 @@
       "Write(tests/**)",
       "Write(docs/**)",
       "Write(.claude/**)",
+      "PowerShell(Get-ChildItem*)",
 
       "mcp__centinel__check_ioc",
       "mcp__centinel__scan_package",
@@ -83,8 +84,15 @@
       "PowerShell(git diff*)",
       "PowerShell(git log*)",
 
-      "WebFetch(https://**)",
-      "WebFetch(domain:skills.sh)"
+      "WebSearch",
+      "WebFetch(domain:docs.anthropic.com)",
+      "WebFetch(domain:skills.sh)",
+      "WebFetch(domain:api.osv.dev)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:api.github.com)",
+
+      "Skill"
     ]
   },
   "hooks": {

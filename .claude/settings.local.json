@@ -1,16 +1,15 @@
 {
   "permissions": {
     "allow": [
+      "WebFetch(domain:docs.anthropic.com)",
+      "WebFetch(domain:skills.sh)",
+      "WebFetch(domain:api.osv.dev)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "WebFetch(domain:api.github.com)",
-      "Bash(python3 -c \"import mcp; print\\('mcp SDK:', mcp.__version__\\)\")",
-      "Bash(pip install *)",
-      "Bash(python3 *)",
-      "Bash(CLAUDE_TOOL_INPUT='{\"command\":\"rm -rf /\"}' python3 \"C:/Users/0020415/workspace/tmp/claude-config/hooks/centinel_preflight.py\")",
-      "Bash(echo \"Exit code: $?\")",
-      "Bash(CLAUDE_TOOL_INPUT='{\"command\":\"rm -rf /\"}' python3 -W all centinel_preflight.py)",
-      "Bash(echo \"Exit: $?\")"
+      "WebSearch",
+      "PowerShell(Get-ChildItem*)",
+      "Bash(npx skills *)"
     ]
   }
 }
