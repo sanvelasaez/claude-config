@@ -2,27 +2,35 @@
   "_descripcion": "Template de permisos y hooks para un proyecto. Copiar a .claude/settings.json en la raíz del proyecto y ajustar según el stack. Extiende ~/.claude/settings.json — nunca elimina ni contradice los deny globales.",
   "permissions": {
     "allow": [
-      "Write(src/**)",
-      "Write(tests/**)",
-      "Write(docs/**)",
-      "Write(.claude/**)",
-      "Bash(npm install)",
-      "Bash(npm run *)",
-      "Bash(npx *)"
+      "Read(**)",
+      "Write(**)",
+      "Edit(**)",
+
+      "Bash(git status)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git branch)",
+      "PowerShell(git status)",
+      "PowerShell(git diff*)",
+      "PowerShell(git log*)",
+      "PowerShell(Get-ChildItem*)",
+
+      "Skill"
     ],
     "deny": [
-      "Write(src/generated/**)"
+      "Write(**/generated/**)",
+      "Write(**/migrations/auto/**)"
     ]
   },
   "hooks": {
     "PostToolUse": [
       {
-        "_comentario": "Ejemplo: ejecutar lint después de cada escritura en src/. Ajustar el comando al linter del proyecto.",
-        "matcher": "Write",
+        "_comentario": "Ejemplo: ejecutar lint después de cada escritura. Ajustar el comando al linter del proyecto.",
+        "matcher": "Write|Edit",
         "hooks": [
           {
             "type": "command",
-            "command": "echo 'Hook PostToolUse Write — añadir aquí el comando de lint/format del proyecto'"
+            "command": "echo 'Hook PostToolUse Write|Edit — añadir aquí el comando de lint/format del proyecto'"
           }
         ]
       }
@@ -30,9 +38,10 @@
   },
   "_instrucciones": [
     "1. Renombrar o eliminar las claves que empiezan por '_' — son solo documentación",
-    "2. Ajustar la lista 'allow' según los comandos que usa el stack del proyecto",
-    "3. Añadir en 'deny' las rutas que no se deben modificar (auto-generados, legacy, etc.)",
-    "4. Sustituir el hook de ejemplo por el linter/formatter real del proyecto",
-    "5. Si el flujo Git está activo, añadir: Bash(git add*), Bash(git commit*), Bash(git checkout*), Bash(git switch*)"
+    "2. Write(**) y Edit(**) permiten modificar cualquier archivo del proyecto; añadir deny para rutas auto-generadas o inmutables",
+    "3. Añadir en 'deny' las rutas específicas del proyecto que no se deben modificar",
+    "4. Sustituir el hook de ejemplo por el linter/formatter real del proyecto (eslint, prettier, black, checkstyle...)",
+    "5. Si el flujo Git está activo, añadir a allow: Bash(git add*), Bash(git commit*), Bash(git checkout*), Bash(git switch*)",
+    "6. Los permisos de Bash/PowerShell para herramientas de build (npm, mvn, gradle, pip...) ya están en el global settings"
   ]
 }
