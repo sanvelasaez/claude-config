@@ -563,7 +563,9 @@ Claude Code NUNCA debe:
 - Continuar una implementación cuando hay ambigüedad en la tarea
 - Añadir o modificar permisos sin preguntar si deben ser globales o de proyecto
 - Añadir una skill, MCP o herramienta sin actualizar este CLAUDE.md
-- Usar `cd` en comandos bash — siempre rutas absolutas o relativas a la raíz del proyecto, nunca `cd <dir> && comando`
+- Usar `cd <dir> && comando` encadenado — el working directory ya es el proyecto; ejecutar el comando directamente sin cambiar de directorio
+- Usar flags de ruta como sustituto de `cd` (p.ej. `git -C "ruta" status`) — si se necesita verificar la ubicación actual, ejecutar primero `pwd` como comando separado, luego el comando principal por separado; nunca encadenar con `&&` salvo que el segundo dependa del resultado del primero
+- Encadenar comandos con `&&` cuando no hay dependencia real entre ellos — si son independientes, ejecutarlos en llamadas separadas
 - Modificar archivos en `~/.claude/` — son inmutables por agentes; solo el usuario los modifica
 
 ---
