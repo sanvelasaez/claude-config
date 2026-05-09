@@ -27,7 +27,7 @@ console.log("1. REQUISITOS DE SISTEMA");
 ensureNode();
 ensureClaudeCode();
 ensureGit();
-ensurePython();
+const pythonCmd = ensurePython();
 sep();
 
 if (check) {
@@ -53,7 +53,7 @@ console.log(`2. ARCHIVOS → ${CLAUDE_DIR}`);
 if (!force) info("Los archivos existentes NO se sobreescriben (usa --force para actualizar)");
 backupSettings();
 const stats = installFiles();
-fixPythonCommandInSettings();
+fixPythonCommandInSettings(pythonCmd);
 sep();
 info(`Resumen: ${stats.copied} nuevos, ${stats.updated} actualizados, ${stats.skipped} omitidos, ${stats.errors} errores`);
 sep();

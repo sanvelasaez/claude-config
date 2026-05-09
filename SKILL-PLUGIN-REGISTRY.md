@@ -65,14 +65,6 @@ Instalados en `~/.claude/plugins/cache/<marketplace>/<plugin>/`. Se gestionan co
 
 ---
 
-## Skills desinstaladas o bloqueadas
-
-| Nombre | Motivo | Fecha |
-|---|---|---|
-| `skill-finder` | Fusionada en `find-skills` | 2026-04-30 |
-
----
-
 ## Historial de auditorías de elementos externos
 
 > Cada vez que se audita un elemento externo con `centinel-auditor`, registrar aquí el resultado.
