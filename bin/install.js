@@ -76,7 +76,7 @@ setHookPermissions();
 sep();
 
 console.log("7. VERIFICACION FINAL");
-const installOk = runChecks();
+const installOk = runChecks(pythonCmd);
 
 if (!installOk || stats.errors > 0) {
   warn("La instalacion completó con errores. Revisar la salida anterior.");
