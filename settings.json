@@ -1,4 +1,4 @@
-﻿{
+{
   "_descripcion": "Configuración global de Claude Code. Copiar a ~/.claude/settings.json en cada instalación nueva.",
   "language": "Español",
   "permissions": {
@@ -37,8 +37,10 @@
       "Bash(npm install*)",
       "Bash(npm run*)",
       "Bash(npx *)",
+      "Bash(npx skills *)",
       "Bash(node *)",
       "Bash(python3 *)",
+      "Bash(python3 -c *",
       "Bash(python *)",
       "Bash(pip install*)",
       "Bash(pip3 install*)",
@@ -60,6 +62,13 @@
       "Bash(git status)",
       "Bash(git diff*)",
       "Bash(git log*)",
+      "Bash(git -C status)",
+      "Bash(git -C diff)",
+      "Bash(git -C log*)",
+      "Bash(gh api *)",
+      "Bash(curl -s *)",
+      "Bash(curl *)",
+      "Bash(jq *)",
 
       "PowerShell(npm *)",
       "PowerShell(node *)",
@@ -85,13 +94,16 @@
       "PowerShell(git log*)",
 
       "WebSearch",
+      "Bash(winget *)",
       "WebFetch(domain:docs.anthropic.com)",
       "WebFetch(domain:skills.sh)",
       "WebFetch(domain:api.osv.dev)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "WebFetch(domain:api.github.com)",
+      "WebFetch(domain:docs.warp.dev)",
 
+      "Bash(claude plugin *)",
       "Skill"
     ]
   },

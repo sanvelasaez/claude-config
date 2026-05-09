@@ -9,7 +9,16 @@
       "WebFetch(domain:api.github.com)",
       "WebSearch",
       "PowerShell(Get-ChildItem*)",
-      "Bash(npx skills *)"
+      "Bash(npx skills *)",
+      "Bash(gh api *)",
+      "WebFetch(domain:docs.warp.dev)",
+      "Bash(curl -s \"https://api.github.com/repos/warpdotdev/claude-code-warp\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('Stars:', d['stargazers_count']\\); print\\('Forks:', d['forks_count']\\); print\\('Created:', d['created_at']\\); print\\('Last push:', d['pushed_at']\\); print\\('Lang:', d['language']\\); print\\('Archived:', d['archived']\\); print\\('Topics:', d.get\\('topics',[]\\)\\)\")",
+      "Bash(curl *)",
+      "Bash(jq *)",
+      "Bash(claude plugin *)",
+      "Bash(Remove-Item *)",
+      "Bash(git -C *)"
     ]
   }
 }

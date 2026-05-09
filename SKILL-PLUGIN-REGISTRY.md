@@ -1,8 +1,8 @@
-# 📋 Registro de Skills Instaladas
+# 📋 Registro de Skills y Plugins Instalados
 
-> Este archivo registra todas las skills activas, su origen, estado de seguridad y fecha de incorporación.
-> Se actualiza cada vez que se instala, desinstala o actualiza una skill.
-> Última actualización: 2026-04
+> Registra todas las skills y plugins activos, su origen, estado de seguridad y fecha de incorporación.
+> Se actualiza cada vez que se instala, desinstala o actualiza una skill o plugin.
+> Última actualización: 2026-05
 
 ---
 
@@ -20,11 +20,12 @@
 
 ## Skills activas
 
+Instaladas en `~/.claude/skills/`. Las del repo se copian con `npx github:sanvelasaez/claude-config`; las externas se instalan con `npx skills add`.
+
 | Nombre | Origen | Seguridad | Versión/Fecha | Notas |
 |---|---|---|---|---|
 | `centinel-auditor` | Creación propia | 🔵 PROPIA | 2026-04 | Skill de seguridad base — prioridad máxima. Enriquecida con IOCs de MCP Sentinel |
 | `centinel-update` | Creación propia | 🔵 PROPIA | 2026-04 | Mantenimiento de IOCs, hooks y skills — checklist trimestral + respuesta a incidentes |
-| `code-review` | Creación propia | 🔵 PROPIA | 2026-04 | Revisión de código pre-merge |
 | `security-audit` | Creación propia | 🔵 PROPIA | 2026-04 | Auditoría OWASP y autenticación |
 | `test-writer` | Creación propia | 🔵 PROPIA | 2026-04 | Generación de tests unitarios e integración |
 | `debug-tracer` | Creación propia | 🔵 PROPIA | 2026-04 | Depuración sistemática con hipótesis |
@@ -34,8 +35,33 @@
 | `perf-profiler` | Creación propia | 🔵 PROPIA | 2026-04 | Análisis de rendimiento basado en métricas |
 | `reflection` | Creación propia | 🔵 PROPIA | 2026-04 | Análisis de sesión para mejora continua |
 | `find-skills` | Tercero: vercel-labs/skills (MIT) + Extensiones propias | 🟡 CONFIABLE | 2026-05-08 | Instalada upstream. Extensiones en repo (`SKILL.ext.md`): fuentes adicionales (GitHub, /help, docs Anthropic), centinel-auditor obligatorio antes de instalar, sin flag -y. Aplicar con `npm run merge-skill -- find-skills`. |
-| `skill-creator` | Tercero: anthropics/skills (Apache 2.0) | 🟢 VERIFICADA | 2026-04-30 | Instalada upstream sin modificaciones. 177.3K installs. Gen=Safe, Socket=0, Snyk=Low Risk. Instalar con `npx skills add anthropics/skills@skill-creator -g`. |
-| `owasp-security` | Tercero: agamm/claude-code-owasp (MIT) | 🟡 CONFIABLE | 2026-05-06 | OWASP Top 10:2025, ASVS 5.0, LLM Top 10:2025, Agentic AI Security 2026. Instalada con `npx skills add agamm/claude-code-owasp -g -y`. Gen=Safe, Socket=0 alerts, Snyk=Low Risk. Pendiente: fusionar formato de output y checklist de `security-audit`. |
+| `owasp-security` | Tercero: agamm/claude-code-owasp (MIT) | 🟡 CONFIABLE | 2026-05-06 | OWASP Top 10:2025, ASVS 5.0, LLM Top 10:2025, Agentic AI Security 2026. Gen=Safe, Socket=0 alerts, Snyk=Low Risk. |
+
+---
+
+## Plugins instalados
+
+Instalados en `~/.claude/plugins/cache/<marketplace>/<plugin>/`. Se gestionan con `claude plugin`.
+
+| Nombre | Marketplace | Origen | Seguridad | Fecha auditoría | Qué aporta |
+|---|---|---|---|---|---|
+| `skill-creator` | `claude-plugins-official` | Anthropic oficial | 🟢 VERIFICADA | 2026-05-09 | Crear y mejorar skills con ciclo de evaluación iterativo |
+| `hookify` | `claude-plugins-official` | Anthropic oficial | 🟢 VERIFICADA | 2026-05-09 | Crear hooks mediante lenguaje natural; sin código ejecutable exfiltrable |
+| `security-guidance` | `claude-plugins-official` | Anthropic oficial | 🟢 VERIFICADA | 2026-05-09 | Hook PreToolUse para detectar patrones inseguros en código (eval, XSS, injection). Python revisado, sin red |
+| `frontend-design` | `claude-plugins-official` | Anthropic oficial | 🟢 VERIFICADA | 2026-05-09 | Skill de implementación frontend production-grade (full-stack) |
+| `claude-md-management` | `claude-plugins-official` | Anthropic oficial | 🟢 VERIFICADA | 2026-05-09 | Audita CLAUDE.md vs codebase; captura learnings de sesión |
+| `feature-dev` | `claude-plugins-official` | Anthropic oficial | 🟢 VERIFICADA | 2026-05-09 | Flujo 7 fases con 3 agentes (explorer, architect, reviewer) |
+| `code-review` | `claude-plugins-official` | Anthropic oficial | 🟢 VERIFICADA | 2026-05-09 | 4 agentes paralelos con scoring de confianza ≥80 para PRs |
+| `pr-review-toolkit` | `claude-plugins-official` | Anthropic oficial | 🟢 VERIFICADA | 2026-05-09 | 6 agentes especializados: comentarios, tests, fallos silenciosos, tipos, calidad, simplificación |
+| `plugin-dev` | `claude-plugins-official` | Anthropic oficial | 🟢 VERIFICADA | 2026-05-09 | Toolkit para desarrollar plugins propios: 7 skills + agentes + flujo guiado 8 fases |
+| `warp` | `claude-code-warp` | Partner oficial (Warp Terminal) | 🟢 VERIFICADA | preinstalado | Integración con Warp Terminal |
+
+### Marketplaces configurados
+
+| Nombre | Fuente GitHub | Tipo |
+|---|---|---|
+| `claude-plugins-official` | `anthropics/claude-plugins-official` | Oficial Anthropic |
+| `claude-code-warp` | `warpdotdev/claude-code-warp` | Partner oficial |
 
 ---
 
@@ -55,8 +81,8 @@
 |---|---|---|---|---|
 | `soy-rafa/claude-mcp-sentinel` | Repo GitHub / Hook | ⚠️ PRECAUCIÓN | 2026-04-29 | Repo legítimo con buenas intenciones; no instalado como MCP. IOC patterns extraídos e integrados en centinel_iocs.json y centinel-auditor.md |
 | `vercel-labs/find-skills` | Skill / SKILL.md | ⚠️ PRECAUCIÓN→🟡 | 2026-04-30 | Fuente legítima (Vercel, MIT, 16.6K stars). Instalada con modificaciones: proceso de instalación requiere centinel-auditor obligatorio (paso 6) y sin flag -y. Riesgo mitigado: el ecosistema skills.sh tiene 13.4% de skills con issues críticos según ToxicSkills/Snyk (2026). Verificaciones de Vercel confirman que sus paquetes npm no fueron comprometidos en el incidente de abril 2026. |
-| `anthropics/skills@skill-creator` | Skill / SKILL.md + scripts + agentes | 🟢 APROBADA | 2026-04-30 | Anthropic oficial (127K stars, Apache 2.0). Gen=Safe, Socket=0 alertas, Snyk=Low Risk. SKILL.md analizado: sin llamadas de red inesperadas, sin exfiltración, con sección de seguridad explícita. Traducida al español tras instalación. |
 | `agamm/claude-code-owasp` | Skill / SKILL.md | 🟡 CONFIABLE | 2026-05-06 | Tercero individual. MIT. Commits activos (último abr 2026). Sin advisories en GitHub DB. Solo SKILL.md, sin binarios ni scripts de instalación. Contenido defensivo puro. Validación adicional del installer: Gen=Safe, Socket=0, Snyk=Low Risk. |
+| `anthropics/claude-plugins-official` (9 plugins) | Plugins / Markdown + Python hooks | 🟢 VERIFICADA | 2026-05-09 | Org Anthropic verificada por GitHub. 18.960 stars, mantenimiento diario. Código ejecutable revisado en security-guidance y hookify: sin red, sin acceso a secretos, fail-safe. Resto son Markdown puro. |
 
 ---
 
@@ -72,34 +98,26 @@
 3. Si la auditoría generó un informe: añadirlo en "Historial de auditorías"
 4. Actualizar la tabla de skills en CLAUDE.md
 
-### Al desinstalar una skill
+### Al instalar un plugin nuevo
 
-1. Mover la fila de "Skills activas" a "Skills desinstaladas o bloqueadas"
-2. Registrar el motivo (desinstalada voluntariamente / bloqueada por riesgo / sustituida por otra)
-3. Actualizar CLAUDE.md eliminando la skill de la tabla
+1. Ejecutar `centinel-auditor` — revisar código ejecutable (hooks, scripts) y llamadas de red
+2. Instalar: `claude plugin install <nombre>@<marketplace>`
+3. Añadir fila a la tabla "Plugins instalados" con resultado de auditoría
+4. Si la auditoría generó un informe: añadirlo en "Historial de auditorías"
+5. Actualizar la sección de Plugins en CLAUDE.md
 
-### Al actualizar una skill existente
+### Al desinstalar una skill o plugin
 
-**Método automático (recomendado):**
-```
-node scripts/update-skills.js          # actualiza todo
-node scripts/update-skills.js --check  # dry-run, ver qué cambiaría
-```
-O desde Claude Code con el slash command: `/update-skills`
+**Skill:** mover la fila a "Skills desinstaladas o bloqueadas" con el motivo.
+**Plugin:** eliminar la fila de la tabla de plugins. Registrar si fue por riesgo.
+En ambos casos: actualizar CLAUDE.md eliminando la entrada.
 
-El script lee `scripts/skills-manifest.json` para saber:
-- Qué skills están en el **config repo** (se actualizan con `npx --yes github:sanvelasaez/claude-config`)
-- Qué skills son **externas** (se actualizan con su `npx skills add` específico)
+### Al actualizar skills o plugins
 
-**Pasos manuales siempre necesarios después:**
-1. Si es de origen externo: repetir la auditoría con `centinel-auditor`
-2. Actualizar la columna "Versión/Fecha" en la tabla de skills activas
-3. Si el resultado de la auditoría cambia: actualizar el símbolo de seguridad y registrar en el historial
-
-**Para añadir una nueva skill externa al mantenimiento automático:**
-1. Auditar con `centinel-auditor`
-2. Añadir entrada en `scripts/skills-manifest.json` → sección `external_skills`
-3. Añadir fila en la tabla de skills activas de este archivo
+**Skills del repo:** `npx --yes github:sanvelasaez/claude-config`
+**Skills externas:** `npx skills add <repo@skill> -g` + `npm run merge-skill -- <nombre>`
+**Plugins:** `claude plugin update <nombre>`
+Actualizar la columna "Versión/Fecha" tras cada actualización.
 
 ---
 
@@ -110,7 +128,7 @@ Las skills de terceros se instalan SIN modificar desde su fuente upstream. Las p
 ### Arquitectura
 
 ```
-skills/<nombre>/
+skills-extensions/<nombre>/
 └── SKILL.ext.md   ← solo este archivo en el repo (nuestras adiciones)
 
 ~/.claude/skills/<nombre>/
@@ -131,19 +149,10 @@ El `SKILL.ext.md` del repo se añade **al final** del `SKILL.md` instalado, deli
 
 ```bash
 npm run merge-skill -- find-skills   # una skill concreta
-npm run merge-skills                  # todas las que tengan SKILL.ext.md
+npm run merge-skills                  # todas las que tengan SKILL.ext.md en skills-extensions/
 ```
 
 El script es idempotente: si ya existe un bloque de extensión, lo reemplaza.
-
-### Flujo al actualizar una skill de terceros
-
-```
-npx skills add <repo@skill> -g        # reinstala upstream limpio
-npm run merge-skill -- <nombre>        # reaplica la extensión
-```
-
-`update-skills.js --external` hace ambos pasos automáticamente.
 
 ### Extensiones actuales
 

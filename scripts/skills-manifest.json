@@ -6,7 +6,6 @@
   "repo_skills": [
     "centinel-auditor",
     "centinel-update",
-    "code-review",
     "security-audit",
     "test-writer",
     "debug-tracer",
@@ -26,15 +25,6 @@
       "installed_date": "2026-04-30",
       "requires_centinel_audit_before_update": false,
       "notes": "Skill de descubrimiento del ecosistema skills.sh. Tiene extensión en el repo (SKILL.ext.md) que se aplica automáticamente tras la instalación."
-    },
-    {
-      "name": "skill-creator",
-      "repo": "anthropics/skills",
-      "install_command": "npx skills add anthropics/skills@skill-creator -g -y",
-      "security_level": "VERIFICADA",
-      "installed_date": "2026-04-30",
-      "requires_centinel_audit_before_update": false,
-      "notes": "Skill oficial de Anthropic para crear y mejorar skills. Apache 2.0. 177K installs."
     },
     {
       "name": "owasp-security",

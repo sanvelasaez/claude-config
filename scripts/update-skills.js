@@ -151,7 +151,7 @@ if (CHECK) {
   console.log("  Actualización completada.");
   console.log("  (Las extensiones de skills externas se han aplicado automáticamente.)");
   console.log("");
-  console.log("  Recuerda actualizar SKILL-REGISTRY.md:");
+  console.log("  Recuerda actualizar SKILL-PLUGIN-REGISTRY.md:");
   console.log("    · Columna Versión/Fecha de cada skill actualizada (fecha de hoy)");
   console.log("    · Si alguna skill externa tuvo nueva versión: añadir fila al historial");
   console.log("    · Si centinel-auditor detectó algo relevante: registrarlo también");
