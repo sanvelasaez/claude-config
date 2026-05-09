@@ -132,3 +132,29 @@ Además del hook de seguridad, el `settings.json` incluye hooks para auditoría 
 | Git | cualquiera | Flujo git-workflow.md (opcional) | No |
 
 El instalador detecta automáticamente si Node.js o Python no están y los instala usando el gestor de paquetes del sistema.
+
+## Notas para Windows
+
+### 1 — Deshabilitar los alias de ejecución de aplicaciones de Python
+
+Windows 10/11 incluye por defecto dos alias (`python.exe` y `python3.exe`) que, en lugar de ejecutar Python, abren el Microsoft Store. Esto hace que los hooks y plugins fallen aunque Python esté correctamente instalado.
+
+Hay que desactivarlos antes de instalar:
+
+> **Inicio → Configuración → Aplicaciones → Aplicaciones y características → Alias de ejecución de aplicaciones**
+
+Desactiva los dos entradas llamadas **"Instalador de aplicación"** para `python.exe` y `python3.exe`.
+
+Si están activos, `python --version` abrirá el Store en lugar de mostrar la versión instalada.
+
+### 2 — Alias python3 (creado automáticamente)
+
+En Windows, Python solo instala `python.exe`. Los plugins oficiales de Anthropic (como `hookify` y `security-guidance`) usan `python3` en sus hooks, lo que provoca el error `python3: command not found`.
+
+El instalador resuelve esto automáticamente: crea un hardlink `python3.exe → python.exe` en el mismo directorio de Python. El hardlink no ocupa espacio adicional en disco y funciona en todos los entornos (PowerShell, CMD y Git Bash).
+
+Si en algún momento actualizas Python y el hardlink queda desactualizado, basta con volver a ejecutar el instalador:
+
+```bash
+npx --yes github:sanvelasaez/claude-config
+```
