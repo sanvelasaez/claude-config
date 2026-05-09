@@ -114,7 +114,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.claude/hooks/centinel_preflight.py"
+            "command": "python ~/.claude/hooks/centinel_preflight.py"
           }
         ]
       },
@@ -123,7 +123,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.claude/hooks/centinel_preflight.py"
+            "command": "python ~/.claude/hooks/centinel_preflight.py"
           }
         ]
       },
@@ -132,7 +132,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.claude/hooks/centinel_preflight.py"
+            "command": "python ~/.claude/hooks/centinel_preflight.py"
           }
         ]
       },
@@ -141,7 +141,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.claude/hooks/centinel_preflight.py"
+            "command": "python ~/.claude/hooks/centinel_preflight.py"
           }
         ]
       },
@@ -150,7 +150,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.claude/hooks/centinel_preflight.py"
+            "command": "python ~/.claude/hooks/centinel_preflight.py"
           }
         ]
       }
