@@ -674,6 +674,36 @@ templates/
 
 ---
 
+## 🛠️ DESARROLLO DE ESTE INSTALADOR
+
+> Esta sección aplica **solo cuando se trabaja en el repositorio `claude-config`** (el instalador).
+> Es irrelevante cuando se usa la configuración instalada en otros proyectos.
+
+### Regla crítica: los cambios deben subirse a GitHub antes de probarlos
+
+`npx github:sanvelasaez/claude-config` **siempre descarga de GitHub**, no usa archivos locales.
+Editar `bin/install.js` o cualquier otro archivo del instalador no tiene efecto hasta hacer push.
+
+**Flujo obligatorio para cualquier cambio en el instalador:**
+
+```
+1. Editar el archivo en este repo
+2. git add <archivos>
+3. git commit -m "descripción"
+4. git push
+5. Solo entonces: /setup  (o npx --yes github:sanvelasaez/claude-config)
+```
+
+**Para probar sin hacer push** (verificar que el código es correcto antes de subir):
+
+```bash
+node bin/install.js
+```
+
+Esto ejecuta el instalador local directamente. Útil para depurar antes de publicar.
+
+---
+
 > 💡 **Nota para Claude:** Este archivo es la fuente de verdad de la configuración global y se mantiene actualizado en tiempo real.  
 > La configuración de proyecto (`.claude/CLAUDE.md`) extiende este archivo pero nunca contradice sus reglas de seguridad, permisos o comportamientos prohibidos.  
 > Los flujos opcionales (`git-workflow.md` y similares) se activan de forma explícita por proyecto cuando se requieren.
