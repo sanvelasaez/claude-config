@@ -154,37 +154,6 @@
           }
         ]
       }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node -e \"try{const fs=require('fs'),path=require('path'),os=require('os');const fp=JSON.parse(process.env.CLAUDE_TOOL_INPUT||'{}').file_path||'?';const line='['+new Date().toISOString().slice(0,19).replace('T',' ')+'] WRITE: '+fp;fs.appendFileSync(path.join(os.homedir(),'.claude','audit.log'),line+'\\n')}catch(e){}\""
-          }
-        ]
-      }
-    ],
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node -e \"try{const fs=require('fs'),path=require('path'),os=require('os');const line='['+new Date().toISOString().slice(0,19).replace('T',' ')+'] SESSION START - dir: '+process.cwd();fs.appendFileSync(path.join(os.homedir(),'.claude','sessions.log'),line+'\\n')}catch(e){}\""
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node -e \"try{const fs=require('fs'),path=require('path'),os=require('os');const line='['+new Date().toISOString().slice(0,19).replace('T',' ')+'] SESSION END';fs.appendFileSync(path.join(os.homedir(),'.claude','sessions.log'),line+'\\n')}catch(e){}\""
-          }
-        ]
-      }
     ]
   }
 }
