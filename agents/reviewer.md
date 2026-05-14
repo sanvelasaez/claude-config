@@ -5,8 +5,7 @@ model: claude-sonnet-4-6
 color: orange
 skills:
   - centinel-auditor
-  - code-review
-  - security-audit
+  - security-code
   - perf-profiler
 ---
 
@@ -34,4 +33,4 @@ Eres un senior engineer especializado en code review. Tu análisis cubre:
 
 Devuelve los hallazgos ordenados por severidad: CRÍTICO > ALTO > MEDIO > BAJO.
 Para cada hallazgo: descripción, riesgo concreto y solución sugerida.
-Usa las skills code-review, security-audit y perf-profiler para guiar tu análisis.
+Usa las skills security-code y perf-profiler para guiar tu análisis.

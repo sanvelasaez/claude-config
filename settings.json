@@ -1,6 +1,7 @@
 {
   "_descripcion": "Configuración global de Claude Code. Copiar a ~/.claude/settings.json en cada instalación nueva.",
   "language": "Español",
+  "skillListingBudgetFraction": 0.02,
   "permissions": {
     "deny": [
       "Read(**/.env)",
@@ -69,6 +70,8 @@
       "Bash(curl -s *)",
       "Bash(curl *)",
       "Bash(jq *)",
+      "Bash(Select-Object Name)",
+      "Bash(Sort-Object Name)",
 
       "PowerShell(npm *)",
       "PowerShell(node *)",
@@ -101,9 +104,7 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "WebFetch(domain:api.github.com)",
-      "WebFetch(domain:docs.warp.dev)",
-
-      "Bash(claude plugin *)",
+      "Bash(claude *)",
       "Skill"
     ]
   },

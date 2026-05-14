@@ -6,7 +6,7 @@ color: green
 skills:
   - centinel-auditor
   - test-writer
-  - security-audit
+  - security-code
   - perf-profiler
 ---
 

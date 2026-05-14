@@ -50,10 +50,10 @@ Esta instrucción forma parte del system prompt, así que Claude la aplica en ca
 Claude llama a la herramienta `Skill` con el nombre de la skill:
 
 ```
-Skill({ skill: "code-review" })
+Skill({ skill: "security-code" })
 ```
 
-Claude Code lee el archivo completo `~/.claude/skills/code-review/SKILL.md` y lo inyecta en el contexto del turno actual. A partir de ese momento Claude tiene el proceso completo: pasos, criterios, formato de salida. La skill se carga **bajo demanda**, no al inicio. Por eso el skill listing solo incluye nombres y descripciones: cargar el contenido de 13 skills en cada turno sería demasiado costoso en tokens.
+Claude Code lee el archivo completo `~/.claude/skills/security-code/SKILL.md` y lo inyecta en el contexto del turno actual. A partir de ese momento Claude tiene el proceso completo: pasos, criterios, formato de salida. La skill se carga **bajo demanda**, no al inicio. Por eso el skill listing solo incluye nombres y descripciones: cargar el contenido de las skills en cada turno sería demasiado costoso en tokens.
 
 ---
 

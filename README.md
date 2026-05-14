@@ -49,8 +49,7 @@ Tres capas que trabajan juntas:
 | 1 | `centinel-auditor` | Cualquier elemento de origen externo |
 | 2 | `find-skills` | Buscar o instalar skills nuevas |
 | 3 | `centinel-update` | Mantenimiento trimestral de IOCs |
-| 4 | `code-review` | Antes de considerar una implementación terminada |
-| 5 | `security-audit` | Código con autenticación, credenciales o datos sensibles |
+| 4 | `security-code` | Código con autenticación, credenciales o datos sensibles |
 | 6 | `test-writer` | Código nuevo o modificado sin cobertura |
 | 7 | `debug-tracer` | Bugs no obvios o errores intermitentes |
 | 8 | `arch-patterns` | Diseño de módulos o refactorizaciones estructurales |

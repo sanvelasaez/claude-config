@@ -26,7 +26,7 @@ Instaladas en `~/.claude/skills/`. Las del repo se copian con `npx github:sanvel
 |---|---|---|---|---|
 | `centinel-auditor` | Creación propia | 🔵 PROPIA | 2026-04 | Skill de seguridad base — prioridad máxima. Enriquecida con IOCs de MCP Sentinel |
 | `centinel-update` | Creación propia | 🔵 PROPIA | 2026-04 | Mantenimiento de IOCs, hooks y skills — checklist trimestral + respuesta a incidentes |
-| `security-audit` | Creación propia | 🔵 PROPIA | 2026-04 | Auditoría OWASP y autenticación |
+| `security-code` | Creación propia | 🔵 PROPIA | 2026-04 | Creación de código seguro aplicando principios antes de programar |
 | `test-writer` | Creación propia | 🔵 PROPIA | 2026-04 | Generación de tests unitarios e integración |
 | `debug-tracer` | Creación propia | 🔵 PROPIA | 2026-04 | Depuración sistemática con hipótesis |
 | `arch-patterns` | Creación propia | 🔵 PROPIA | 2026-04 | Patrones de diseño y arquitectura |
@@ -35,7 +35,6 @@ Instaladas en `~/.claude/skills/`. Las del repo se copian con `npx github:sanvel
 | `perf-profiler` | Creación propia | 🔵 PROPIA | 2026-04 | Análisis de rendimiento basado en métricas |
 | `reflection` | Creación propia | 🔵 PROPIA | 2026-04 | Análisis de sesión para mejora continua |
 | `find-skills` | Tercero: vercel-labs/skills (MIT) + Extensiones propias | 🟡 CONFIABLE | 2026-05-08 | Instalada upstream. Extensiones en repo (`SKILL.ext.md`): fuentes adicionales (GitHub, /help, docs Anthropic), centinel-auditor obligatorio antes de instalar, sin flag -y. Aplicar con `npm run merge-skill -- find-skills`. |
-| `owasp-security` | Tercero: agamm/claude-code-owasp (MIT) | 🟡 CONFIABLE | 2026-05-06 | OWASP Top 10:2025, ASVS 5.0, LLM Top 10:2025, Agentic AI Security 2026. Gen=Safe, Socket=0 alerts, Snyk=Low Risk. |
 
 ---
 
@@ -51,17 +50,13 @@ Instalados en `~/.claude/plugins/cache/<marketplace>/<plugin>/`. Se gestionan co
 | `frontend-design` | `claude-plugins-official` | Anthropic oficial | 🟢 VERIFICADA | 2026-05-09 | Skill de implementación frontend production-grade (full-stack) |
 | `claude-md-management` | `claude-plugins-official` | Anthropic oficial | 🟢 VERIFICADA | 2026-05-09 | Audita CLAUDE.md vs codebase; captura learnings de sesión |
 | `feature-dev` | `claude-plugins-official` | Anthropic oficial | 🟢 VERIFICADA | 2026-05-09 | Flujo 7 fases con 3 agentes (explorer, architect, reviewer) |
-| `code-review` | `claude-plugins-official` | Anthropic oficial | 🟢 VERIFICADA | 2026-05-09 | 4 agentes paralelos con scoring de confianza ≥80 para PRs |
 | `pr-review-toolkit` | `claude-plugins-official` | Anthropic oficial | 🟢 VERIFICADA | 2026-05-09 | 6 agentes especializados: comentarios, tests, fallos silenciosos, tipos, calidad, simplificación |
-| `plugin-dev` | `claude-plugins-official` | Anthropic oficial | 🟢 VERIFICADA | 2026-05-09 | Toolkit para desarrollar plugins propios: 7 skills + agentes + flujo guiado 8 fases |
-| `warp` | `claude-code-warp` | Partner oficial (Warp Terminal) | 🟢 VERIFICADA | preinstalado | Integración con Warp Terminal |
 
 ### Marketplaces configurados
 
 | Nombre | Fuente GitHub | Tipo |
 |---|---|---|
 | `claude-plugins-official` | `anthropics/claude-plugins-official` | Oficial Anthropic |
-| `claude-code-warp` | `warpdotdev/claude-code-warp` | Partner oficial |
 
 ---
 

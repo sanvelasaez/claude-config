@@ -6,7 +6,7 @@
   "repo_skills": [
     "centinel-auditor",
     "centinel-update",
-    "security-audit",
+    "security-code",
     "test-writer",
     "debug-tracer",
     "arch-patterns",
@@ -25,15 +25,6 @@
       "installed_date": "2026-04-30",
       "requires_centinel_audit_before_update": false,
       "notes": "Skill de descubrimiento del ecosistema skills.sh. Tiene extensión en el repo (SKILL.ext.md) que se aplica automáticamente tras la instalación."
-    },
-    {
-      "name": "owasp-security",
-      "repo": "agamm/claude-code-owasp",
-      "install_command": "npx skills add agamm/claude-code-owasp -g -y",
-      "security_level": "CONFIABLE",
-      "installed_date": "2026-05-06",
-      "requires_centinel_audit_before_update": true,
-      "notes": "OWASP Top 10:2025, ASVS 5.0, LLM Top 10:2025, Agentic AI Security 2026. Solo SKILL.md, sin binarios ni scripts."
     }
   ]
 }

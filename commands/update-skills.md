@@ -1,7 +1,7 @@
 Ejecuta el proceso de mantenimiento de todas las skills instaladas:
 
 **Skills del config repo** (propias + modificadas): se actualizan sincronizando con GitHub.  
-**Skills externas** (terceros puros, como owasp-security): se actualizan con su comando `npx skills add`.
+**Skills externas** (terceros puros, como find-skills): se actualizan con su comando `npx skills add`.
 
 Proceso paso a paso:
 

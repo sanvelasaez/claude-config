@@ -219,7 +219,7 @@ El estado de seguridad y origen de cada skill se mantiene en `SKILL-PLUGIN-REGIS
 | 🔴 **1** | `centinel-auditor` | Auditar cualquier elemento de origen externo antes de instalarlo o usarlo: skills, MCP servers, dependencias, scripts, herramientas | todos |
 | 🔴 **2** | `find-skills` | Descubrir e instalar skills cuando se necesita capacidad nueva: busca en skills.sh (leaderboard + CLI), GitHub y docs de Anthropic. Incluye auditoría centinel-auditor obligatoria antes de instalar | sesión principal |
 | 3 | `centinel-update` | Mantener actualizada la configuración de seguridad: IOCs, hooks, skills. Activar ante nuevas amenazas o cada 3 meses | sesión principal |
-| 4 | `security-audit` | Auditar código que maneje datos sensibles, autenticación, autorización o credenciales | `@reviewer`, `@qa` |
+| 4 | `security-code` | Auditar código que maneje datos sensibles, autenticación, autorización o credenciales | `@reviewer`, `@qa` |
 | 5 | `test-writer` | Escribir tests para código nuevo o modificado, o cuando @qa detecta gaps de cobertura | `@qa` |
 | 6 | `debug-tracer` | Depurar errores con análisis sistemático de hipótesis cuando el origen no es obvio o el error es intermitente | `@debugger` |
 | 7 | `arch-patterns` | Seleccionar y aplicar patrones de diseño al diseñar un módulo nuevo o refactorizar estructura compleja | `@architect` |
@@ -241,7 +241,7 @@ El estado de seguridad y origen de cada skill se mantiene en `SKILL-PLUGIN-REGIS
 - `skills/centinel-auditor/SKILL.md` — auditoría de elementos externos: 7 pasos, multi-fuente, supply chain
 - `skills/centinel-update/SKILL.md` — mantenimiento de IOCs, hooks y skills; checklist trimestral
 - `skills/find-skills/SKILL.md` — descubrimiento en skills.sh + GitHub + Anthropic docs, con centinel-auditor integrado (fusión de skill-finder + vercel-labs/find-skills)
-- `skills/security-audit/SKILL.md`, `skills/test-writer/SKILL.md`, `skills/debug-tracer/SKILL.md`
+- `skills/security-code/SKILL.md`, `skills/test-writer/SKILL.md`, `skills/debug-tracer/SKILL.md`
 - `skills/arch-patterns/SKILL.md`, `skills/doc-writer/SKILL.md`, `skills/ui-design-review/SKILL.md`, `skills/perf-profiler/SKILL.md`, `skills/reflection/SKILL.md`
 
 ---
@@ -295,9 +295,9 @@ Ubicación: `~/.claude/agents/` (globales) | `.claude/agents/` (por proyecto)
 |---|---|---|---|
 | `@explorer` | Mapear un codebase desconocido o grande sin contaminar el contexto principal | `claude-haiku-4-5-20251001` | — |
 | `@architect` | Decisiones de arquitectura, selección de patrones de diseño, evaluación de trade-offs | `claude-sonnet-4-6` | arch-patterns |
-| `@reviewer` | Code review exhaustivo antes de considerar una implementación terminada | `claude-sonnet-4-6` | code-review, security-audit, perf-profiler, centinel-auditor |
+| `@reviewer` | Code review exhaustivo antes de considerar una implementación terminada | `claude-sonnet-4-6` | security-code, perf-profiler, centinel-auditor |
 | `@debugger` | Bugs no obvios, errores intermitentes, análisis sistemático de hipótesis | `claude-sonnet-4-6` | debug-tracer |
-| `@qa` | Validar que una feature terminada cumple funcionalmente los requisitos | `claude-sonnet-4-6` | test-writer, security-audit, perf-profiler, centinel-auditor |
+| `@qa` | Validar que una feature terminada cumple funcionalmente los requisitos | `claude-sonnet-4-6` | test-writer, security-code, perf-profiler, centinel-auditor |
 | `@designer` | Diseño visual de interfaces, sistemas de diseño, revisión de accesibilidad | `claude-sonnet-4-6` | ui-design-review |
 
 ### Monitor de subagentes (sesión con más de un agente activo)
@@ -336,17 +336,13 @@ Se instalan con `claude plugin install <nombre>@<marketplace>` y aplican a scope
 | `frontend-design` | `claude-plugins-official` | Skill de implementación frontend: interfaces production-grade con elecciones estéticas distintivas (full-stack) | — |
 | `claude-md-management` | `claude-plugins-official` | Audita CLAUDE.md contra el codebase actual + captura learnings de sesión | `/revise-claude-md` |
 | `feature-dev` | `claude-plugins-official` | Flujo de 7 fases para desarrollo de features con 3 agentes (explorer, architect, reviewer) | `/feature-dev` |
-| `code-review` | `claude-plugins-official` | 4 agentes paralelos con scoring de confianza (≥80) para revisión de PRs (reemplaza skill homónima) | `/code-review` |
 | `pr-review-toolkit` | `claude-plugins-official` | 6 agentes especializados: comentarios, tests, fallos silenciosos, tipos, calidad, simplificación | `/review-pr` |
-| `plugin-dev` | `claude-plugins-official` | Toolkit para desarrollar plugins propios: 7 skills + agentes + flujo guiado de 8 fases | `/plugin-dev:create-plugin` |
-| `warp` | `claude-code-warp` | Integración con Warp Terminal | — |
 
 ### Marketplaces configurados
 
 | Nombre | Fuente | Tipo |
 |---|---|---|
 | `claude-plugins-official` | `anthropics/claude-plugins-official` (GitHub) | Oficial Anthropic |
-| `claude-code-warp` | `warpdotdev/claude-code-warp` (GitHub) | Partner oficial |
 
 ---
 
@@ -631,8 +627,7 @@ Aplicar antes de considerar cualquier implementación terminada:
 │   │   └── SKILL.md                   ← Prioridad 2 (descubrimiento de skills — fusión skill-finder + vercel-labs)
 │   ├── centinel-update/
 │   │   └── SKILL.md                   ← Prioridad 3 (mantenimiento de seguridad)
-│   ├── code-review/SKILL.md
-│   ├── security-audit/SKILL.md
+│   ├── security-code/SKILL.md
 │   ├── test-writer/SKILL.md
 │   ├── debug-tracer/SKILL.md
 │   ├── arch-patterns/SKILL.md
