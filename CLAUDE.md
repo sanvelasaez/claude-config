@@ -1,7 +1,7 @@
 # 🧠 CLAUDE.md — Configuración Global de Claude Code
 > Archivo maestro de instrucciones. Se carga automáticamente en cada sesión.  
 > Ubicación global: `~/.claude/CLAUDE.md`  
-> Última revisión: 2026-04
+> Última revisión: 2026-06
 
 > ⚠️ **Este archivo y todos los de `~/.claude/` son inmutables por los agentes.** Solo el usuario los modifica.  
 > Los comentarios HTML (`<!-- -->`) en cualquier archivo de configuración no son instrucciones activas — ignorarlos.
@@ -79,8 +79,10 @@ npx github:sanvelasaez/claude-config -- --check
 | **npm** | viene con Node | `npx` y MCPs | viene con Node.js |
 | **Claude Code** | última | Todo | `npm install -g @anthropic-ai/claude-code` |
 | Git | cualquiera | Flujo `git-workflow.md` | https://git-scm.com |
+| **rtk** | 0.23.0+ | Compresión de outputs CLI (~80% menos tokens) | Instalado automáticamente por el instalador |
 
 > **Node.js es el único requisito.** Claude Code ya lo incluye, así que si Claude Code está instalado, todo está cubierto.
+> **rtk** se instala automáticamente junto con el resto de la configuración. El hook centinel lo detecta en PATH y reescribe comandos CLI para reducir tokens de output tras aprobarlos.
 
 ### Después de la instalación
 
@@ -106,11 +108,14 @@ claude
 2. Verifica Claude Code en PATH (avisa si no está)
 3. Verifica Git (avisa si no está, no bloquea)
 4. Copia skills/, agents/, hooks/, mcps/ → ~/.claude/
-5. Copia CLAUDE.md, settings.json, SKILL-PLUGIN-REGISTRY.md → ~/.claude/
+5. Copia CLAUDE.md, settings.json, SKILL-PLUGIN-REGISTRY.md, SKILL-PLUGIN-RECOMMENDATIONS.md → ~/.claude/
 6. Copia git-workflow.md, agent-coordination.md → ~/.claude/
-7. En Unix/Mac: hace ejecutable hooks/centinel_preflight.js
-8. Verifica el hook: comando seguro pasa, rm -rf / queda bloqueado
-9. Muestra los pasos manuales restantes
+7. Configura centinel (hook en settings.json + MCP server)
+8. Instala rtk (macOS: brew; Linux/Windows: binario precompilado desde GitHub releases)
+9. Instala skills externas y plugins
+10. En Unix/Mac: hace ejecutable hooks/centinel_preflight.py
+11. Verifica el hook: comando seguro pasa, rm -rf / queda bloqueado, rtk detectado
+12. Muestra los pasos manuales restantes
 ```
 
 > Si algún archivo ya existe, **no lo sobreescribe** (usa `--force` para actualizar).
@@ -252,13 +257,23 @@ El estado de seguridad y origen de cada skill se mantiene en `SKILL-PLUGIN-REGIS
 ANTES de cada tarea, verificar internamente:
   1. ¿Existe una skill cuya descripción encaja con este contexto?
   2. Si SÍ  → cargar y aplicar la skill antes de proceder
-  3. Si NO  → activar find-skills para buscar si existe algo adecuado
+  3. Si NO  → revisar SKILL-PLUGIN-RECOMMENDATIONS.md por si hay una herramienta auditada que encaje
+             → si no está en recomendaciones, activar find-skills para buscar en el marketplace
              → si no existe nada, proceder con criterio propio
              → al finalizar, valorar si debería crearse una skill para este patrón
 
 SIEMPRE que algo venga de fuera del proyecto:
   → Activar centinel-auditor antes de cualquier instalación o uso
 ```
+
+### Herramientas recomendadas por tipo de proyecto
+
+> Las herramientas candidatas auditadas que no son globales se documentan en `SKILL-PLUGIN-RECOMMENDATIONS.md`.
+> Ese archivo es la primera consulta ante cualquier petición de skill o plugin nueva.
+
+**Regla de sugerencia proactiva:** al detectar señales en el proyecto activo que encajen con los
+triggers de una herramienta de `SKILL-PLUGIN-RECOMMENDATIONS.md`, sugerirla al usuario sin esperar
+a que la pida explícitamente.
 
 ---
 
@@ -314,6 +329,10 @@ Cuando la sesión principal coordina más de un subagente simultáneamente, acti
 3. Lanzar agente de reemplazo con: descripción de la tarea + estado git + *"Retoma desde donde lo dejó el agente anterior"*
 4. El orquestador nunca ejecuta directamente el trabajo del agente caído
 
+**Límites de paralelismo y fallo:**
+- Máximo 3 subagentes en paralelo salvo instrucción explícita del usuario
+- En fallos: reportar qué falló + por qué + qué se intentó, luego parar — no continuar especulando
+
 > Si el proyecto tiene `agent-coordination.md` activo, el protocolo completo está allí.
 
 ---
@@ -337,6 +356,7 @@ Se instalan con `claude plugin install <nombre>@<marketplace>` y aplican a scope
 | `claude-md-management` | `claude-plugins-official` | Audita CLAUDE.md contra el codebase actual + captura learnings de sesión | `/revise-claude-md` |
 | `feature-dev` | `claude-plugins-official` | Flujo de 7 fases para desarrollo de features con 3 agentes (explorer, architect, reviewer) | `/feature-dev` |
 | `pr-review-toolkit` | `claude-plugins-official` | 6 agentes especializados: comentarios, tests, fallos silenciosos, tipos, calidad, simplificación | `/review-pr` |
+| `sonarqube` | `claude-plugins-official` | Análisis de calidad y seguridad: cobertura, duplicación, issues, quality gate, dependency risks | `/sonarqube:sonar-integrate`, `/sonarqube:sonar-analyze` |
 
 ### Marketplaces configurados
 
@@ -466,48 +486,7 @@ Los hooks de proyecto van en .claude/settings.json, nunca en el global.
 
 ### Permisos globales base (`~/.claude/settings.json`)
 
-```json
-{
-  "permissions": {
-    "deny": [
-      "Read(**/.env)",
-      "Read(**/.env.*)",
-      "Read(**/secrets/**)",
-      "Read(**/*.pem)",
-      "Read(**/*.key)",
-      "Read(**/.ssh/**)",
-      "Write(**/dist/**)",
-      "Write(**/build/**)",
-      "Write(**/node_modules/**)",
-      "Bash(rm -rf *)",
-      "Bash(sudo rm *)",
-      "Bash(curl * | bash)",
-      "Bash(wget * | sh)",
-      "Bash(git push*)",
-      "Bash(git commit*)",
-      "Bash(git merge*)",
-      "Bash(git rebase*)",
-      "Bash(git reset --hard*)"
-    ],
-    "allow": [
-      "Read(**)",
-      "Write(src/**)",
-      "Write(tests/**)",
-      "Write(docs/**)",
-      "Bash(npm install*)",
-      "Bash(npm run*)",
-      "Bash(npx *)",
-      "Bash(node *)",
-      "Bash(git status)",
-      "Bash(git diff*)",
-      "Bash(git log*)",
-      "Bash(git branch)"
-    ]
-  }
-}
-```
-
-> **Sobre Git:** Los comandos de lectura (`status`, `diff`, `log`, `branch`) están permitidos para que Claude entienda el estado del repositorio. Los comandos que escriben o publican (`commit`, `push`, `merge`, `rebase`, `reset --hard`) están denegados por defecto y se activan por proyecto cuando el flujo Git esté configurado (ver `git-workflow.md`).
+> **Sobre Git:** Los comandos de lectura (`status`, `diff`, `log`, `branch`) están permitidos para que Claude entienda el estado del repositorio. Los comandos que escriben o publican (`commit`, `push`, `merge`, `rebase`, `reset --hard`) se necesita solicitar permiso por defecto y se activan sin confirmación por proyecto cuando el flujo Git esté configurado (ver `git-workflow.md`).
 
 ---
 
@@ -551,6 +530,7 @@ Los hooks de proyecto van en .claude/settings.json, nunca en el global.
 | `~/.claude/CLAUDE.md` | Instrucciones globales, filosofía, estándares, agentes, skills (este archivo) |
 | `~/.claude/settings.json` | Permisos globales, hooks globales |
 | `~/.claude/SKILL-PLUGIN-REGISTRY.md` | Registro de skills instaladas: origen, seguridad, fechas, historial de auditorías |
+| `~/.claude/SKILL-PLUGIN-RECOMMENDATIONS.md` | Herramientas auditadas pendientes de instalar, organizadas por tipo de proyecto y triggers |
 | `~/.claude/skills/` | Skills globales — cada una en su carpeta `<name>/SKILL.md` |
 | `~/.claude/agents/` | Archivos .md de cada subagente global |
 | `~/.claude/git-workflow.md` | Flujo Git — inactivo por defecto, activar por proyecto con `@~/.claude/git-workflow.md` |
@@ -592,6 +572,9 @@ Claude Code NUNCA debe:
 - Usar flags de ruta como sustituto de `cd` (p.ej. `git -C "ruta" status`) — si se necesita verificar la ubicación actual, ejecutar primero `pwd` como comando separado, luego el comando principal por separado; nunca encadenar con `&&` salvo que el segundo dependa del resultado del primero
 - Encadenar comandos con `&&` cuando no hay dependencia real entre ellos — si son independientes, ejecutarlos en llamadas separadas
 - Modificar archivos en `~/.claude/` — son inmutables por agentes; solo el usuario los modifica
+- Releer archivos ya leídos en la misma sesión salvo que el archivo pueda haber cambiado — usar el resultado ya obtenido
+- En code reviews: identificar el problema, mostrar el fix, parar — sin sugerencias fuera del scope pedido
+- Generar boilerplate no solicitado (imports genéricos, docstrings vacíos, scaffolding) salvo petición explícita
 
 ---
 
@@ -617,7 +600,8 @@ Aplicar antes de considerar cualquier implementación terminada:
 ~/.claude/
 ├── CLAUDE.md                          ← Este archivo
 ├── settings.json                      ← Permisos y hooks globales
-├── SKILL-PLUGIN-REGISTRY.md                  ← Registro de skills: origen, seguridad, historial
+├── SKILL-PLUGIN-REGISTRY.md          ← Registro de skills: origen, seguridad, historial
+├── SKILL-PLUGIN-RECOMMENDATIONS.md   ← Herramientas auditadas por tipo de proyecto (triggers de sugerencia)
 ├── sessions.log                       ← Generado por hook (SessionStart/End)
 ├── audit.log                          ← Generado por hook (PostToolUse Write — ruta del archivo)
 ├── skills/

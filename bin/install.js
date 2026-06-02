@@ -15,6 +15,7 @@ const { sep, info, warn, confirmarInstalacion, printNextSteps } = require("../li
 const { ensureNode, ensureClaudeCode, ensureGit, ensurePython } = require("../lib/system");
 const { backupSettings, installFiles, fixPythonCommandInSettings } = require("../lib/files");
 const { ensureHookInSettings, configureMcp, setHookPermissions } = require("../lib/centinel");
+const { ensureRtk } = require("../lib/rtk");
 const { installExternalSkills } = require("../lib/skills");
 const { installPlugins } = require("../lib/plugins");
 const { runChecks } = require("../lib/verify");
@@ -63,19 +64,23 @@ ensureHookInSettings();
 configureMcp();
 sep();
 
-console.log("4. SKILLS EXTERNAS");
+console.log("4. RTK");
+ensureRtk();
+sep();
+
+console.log("5. SKILLS EXTERNAS");
 installExternalSkills();
 sep();
 
-console.log("5. PLUGINS");
+console.log("6. PLUGINS");
 installPlugins();
 sep();
 
-console.log("6. PERMISOS");
+console.log("7. PERMISOS");
 setHookPermissions();
 sep();
 
-console.log("7. VERIFICACION FINAL");
+console.log("8. VERIFICACION FINAL");
 const installOk = runChecks(pythonCmd);
 
 if (!installOk || stats.errors > 0) {

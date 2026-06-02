@@ -5,12 +5,18 @@ centinel_preflight.py — Hook de seguridad en tiempo real para Claude Code.
 Invocado por hooks PreToolUse de settings.json (Bash, Write, Edit, WebFetch).
 Lee CLAUDE_TOOL_INPUT (JSON), infiere el tipo de operación y aplica las
 comprobaciones de centinel_iocs.json.
+
+Si el comando Bash pasa la auditoría y rtk está instalado, lo reescribe
+para reducir el output de tokens antes de devolverlo a Claude Code.
+
 Fail-open: cualquier error interno permite la ejecución (exit 0).
 """
 
 import json
 import os
 import re
+import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -45,13 +51,52 @@ def contains_any(text, substrings):
 
 
 def block(reason):
+    # stdout: Claude Code muestra este texto como motivo de bloqueo
     sys.stdout.write(f"[CENTINEL] BLOQUEADO: {reason}\n")
     sys.stdout.flush()
     sys.exit(1)
 
 
 def warn(reason):
-    sys.stdout.write(f"[CENTINEL] ADVERTENCIA: {reason}\n")
+    # stderr: advertencia visible en logs sin interferir con la respuesta JSON
+    sys.stderr.write(f"[CENTINEL] ADVERTENCIA: {reason}\n")
+    sys.stderr.flush()
+
+
+def try_rtk_rewrite(command):
+    """Intenta reescribir el comando con rtk para reducir tokens de output.
+
+    Retorna el comando reescrito si rtk está instalado y tiene equivalente,
+    o None si rtk no está disponible o no tiene rewrite para este comando.
+    """
+    if not shutil.which("rtk"):
+        return None
+    try:
+        result = subprocess.run(
+            ["rtk", "rewrite", command],
+            capture_output=True, text=True, timeout=2,
+        )
+        # exit 0: rewrite encontrado; exit 1: sin equivalente; exit 2: deny
+        if result.returncode == 0:
+            rewritten = result.stdout.strip()
+            if rewritten and rewritten != command:
+                return rewritten
+    except Exception:
+        pass
+    return None
+
+
+def emit_rewrite(rewritten_command):
+    """Emite la respuesta JSON de rewrite hacia Claude Code y termina."""
+    output = {
+        "hookSpecificOutput": {
+            "hookEventName": "PreToolUse",
+            "permissionDecision": "allow",
+            "permissionDecisionReason": "RTK rewrite",
+            "updatedInput": {"command": rewritten_command},
+        }
+    }
+    sys.stdout.write(json.dumps(output) + "\n")
     sys.stdout.flush()
 
 
@@ -158,7 +203,12 @@ def main():
         iocs = load_iocs()
 
         if "command" in tool_input:
-            check_bash(tool_input.get("command", ""), iocs)
+            command = tool_input.get("command", "")
+            check_bash(command, iocs)
+            # centinel aprobó — intentar rewrite con rtk para reducir tokens
+            rewritten = try_rtk_rewrite(command)
+            if rewritten:
+                emit_rewrite(rewritten)
         elif "url" in tool_input:
             check_web_fetch(tool_input.get("url", ""), iocs)
         elif "file_path" in tool_input:
@@ -167,6 +217,7 @@ def main():
                 tool_input.get("content", tool_input.get("new_string", "")),
                 iocs,
             )
+
         sys.exit(0)
     except SystemExit:
         raise
