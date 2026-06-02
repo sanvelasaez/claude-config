@@ -121,6 +121,46 @@ Además del hook de seguridad, el `settings.json` incluye hooks para auditoría 
 - `PostToolUse Write/Edit` — registra cada archivo modificado en `~/.claude/audit.log`
 - `SessionStart` — registra inicio de sesión en `~/.claude/sessions.log`
 
+## Novedades recientes
+
+### Ahorro de tokens en CLI — integración RTK
+
+El hook `centinel_preflight.py` ahora incluye una segunda fase: tras aprobar un comando Bash, intenta reescribirlo con [rtk](https://github.com/rtk-ai/rtk) para comprimir el output antes de que llegue al contexto del modelo.
+
+El instalador descarga y configura rtk automáticamente (macOS: brew; Linux/Windows: binario precompilado desde GitHub Releases). No requiere configuración adicional.
+
+```
+Claude solicita: git status
+        ↓ centinel (seguridad primero)
+        ↓ rtk rewrite → "rtk git status"
+Claude recibe: * main...origin/main\n M archivo.py   (−84% tokens)
+```
+
+Comandos cubiertos: `git`, `gh`, `grep`, `find`, `ls`, `docker`, `kubectl`, `aws`, `test`, y 15 más. El ahorro es mayor en comandos verbosos (`git status`, `npm test`, `pytest`) y nulo en los que ya usan flags compactos (`--oneline`, `--stat`).
+
+Centinel mantiene prioridad absoluta: los comandos bloqueados nunca llegan a rtk.
+
+### Recomendaciones de herramientas por tipo de proyecto
+
+Nuevo archivo `SKILL-PLUGIN-RECOMMENDATIONS.md` (desplegado en `~/.claude/`) con herramientas auditadas organizadas por triggers de proyecto:
+
+- **context-mode** — compresión de outputs masivos: logs de 10.000 líneas → 300 tokens, snapshots Playwright, APIs JSON grandes. Auditoría: 🟡 PRECAUCIÓN (ver análisis completo antes de instalar).
+- **code-review-graph** — grafo de dependencias AST para codebases >20K líneas. Auditoría: ✅ SEGURO (MIT, sin CVEs).
+
+Claude sugiere estas herramientas proactivamente cuando detecta señales del proyecto que encajan con sus triggers.
+
+### Reglas de eficiencia de tokens en CLAUDE.md
+
+Cinco reglas nuevas derivadas del análisis de `drona23/claude-token-efficient`:
+
+- No releer archivos ya leídos en la misma sesión
+- En code reviews: problema + fix + parar, sin sugerencias fuera de scope
+- No generar boilerplate no solicitado
+- Máximo 3 subagentes en paralelo salvo instrucción explícita
+- En fallos de subagente: reportar qué + por qué + qué se intentó, luego parar
+
+---
+
 ## Requisitos
 
 | Requisito | Versión | Para qué | Instalación automática |
@@ -129,6 +169,7 @@ Además del hook de seguridad, el `settings.json` incluye hooks para auditoría 
 | Python | 3.x | Hook centinel, MCP server | Sí — winget / brew / apt |
 | Claude Code | última | Todo | No — `npm install -g @anthropic-ai/claude-code` |
 | Git | cualquiera | Flujo git-workflow.md (opcional) | No |
+| rtk | 0.23.0+ | Compresión de outputs CLI | Sí — brew (macOS) / binario GitHub (Linux/Windows) |
 
 El instalador detecta automáticamente si Node.js o Python no están y los instala usando el gestor de paquetes del sistema.
 

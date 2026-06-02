@@ -357,12 +357,14 @@ Se instalan con `claude plugin install <nombre>@<marketplace>` y aplican a scope
 | `feature-dev` | `claude-plugins-official` | Flujo de 7 fases para desarrollo de features con 3 agentes (explorer, architect, reviewer) | `/feature-dev` |
 | `pr-review-toolkit` | `claude-plugins-official` | 6 agentes especializados: comentarios, tests, fallos silenciosos, tipos, calidad, simplificación | `/review-pr` |
 | `sonarqube` | `claude-plugins-official` | Análisis de calidad y seguridad: cobertura, duplicación, issues, quality gate, dependency risks | `/sonarqube:sonar-integrate`, `/sonarqube:sonar-analyze` |
+| `context-mode` | `context-mode` | Sandbox de outputs masivos: logs, Playwright, APIs (~98% reducción de tokens de output) | `/ctx_execute`, `/ctx_search`, `/ctx_fetch_and_index` |
 
 ### Marketplaces configurados
 
 | Nombre | Fuente | Tipo |
 |---|---|---|
 | `claude-plugins-official` | `anthropics/claude-plugins-official` (GitHub) | Oficial Anthropic |
+| `context-mode` | `mksglu/context-mode` (GitHub) | Comunitario — auditado ✅ |
 
 ---
 

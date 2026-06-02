@@ -14,43 +14,6 @@
 
 ## Herramientas recomendadas
 
-### context-mode — Compresión masiva de outputs de herramientas
-
-| Campo | Valor |
-|---|---|
-| **Tipo** | MCP server (plugin de Claude Code) |
-| **Scope** | Global — disponible en todos los proyectos |
-| **Instalar** | `claude plugin install context-mode@context-mode` |
-| **Licencia** | ELv2 (Elastic License 2.0) — uso personal permitido |
-| **Auditoría** | 🟡 PRECAUCIÓN — 2026-06 |
-| **Repo** | https://github.com/mksglu/context-mode |
-
-**Qué aporta:**
-Sandboxea los outputs de herramientas pesadas (Playwright, logs, APIs) en subprocesos aislados.
-Solo el `console.log()` del script de análisis entra en el contexto del modelo.
-Reducción real del 98-99% en tokens de output para estos casos.
-
-| Escenario | Sin context-mode | Con context-mode |
-|---|---|---|
-| Log de 10.000 líneas | ~40K tokens | ~300 tokens |
-| Snapshot Playwright | 56 KB | 299 bytes |
-| Respuesta API JSON grande | 60 KB | ~1 KB |
-
-**Cuándo sugerir — triggers:**
-- El usuario menciona analizar logs de producción o archivos de log grandes
-- El proyecto tiene tests E2E con Playwright, Cypress o similar
-- El usuario pega o referencia archivos de más de 500 líneas para análisis
-- El proyecto hace scraping o procesa respuestas de APIs externas masivas
-- El usuario menciona que el contexto se llena rápidamente en sesiones largas
-
-**Riesgos conocidos (informar antes de instalar):**
-- El script `postinstall` modifica `~/.claude/settings.json` automáticamente al instalar
-- Requiere Node.js ≥22.5 (en Linux) o Bun
-- Riesgo de prompt injection si se usa `ctx_fetch_and_index` con URLs no confiables
-- Licencia ELv2: no redistribuible como servicio gestionado
-
----
-
 ### code-review-graph — Navegación estructural de codebases grandes
 
 | Campo | Valor |

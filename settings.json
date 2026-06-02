@@ -154,6 +154,15 @@
             "command": "python ~/.claude/hooks/centinel_preflight.py"
           }
         ]
+      },
+      {
+        "matcher": "mcp__context-mode__ctx_fetch_and_index",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python ~/.claude/hooks/centinel_preflight.py"
+          }
+        ]
       }
     ]
   }
