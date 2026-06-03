@@ -51,12 +51,14 @@ Instalados en `~/.claude/plugins/cache/<marketplace>/<plugin>/`. Se gestionan co
 | `claude-md-management` | `claude-plugins-official` | Anthropic oficial | 🟢 VERIFICADA | 2026-05-09 | Audita CLAUDE.md vs codebase; captura learnings de sesión |
 | `feature-dev` | `claude-plugins-official` | Anthropic oficial | 🟢 VERIFICADA | 2026-05-09 | Flujo 7 fases con 3 agentes (explorer, architect, reviewer) |
 | `pr-review-toolkit` | `claude-plugins-official` | Anthropic oficial | 🟢 VERIFICADA | 2026-05-09 | 6 agentes especializados: comentarios, tests, fallos silenciosos, tipos, calidad, simplificación |
+| `context-mode` | `context-mode` | Comunitario: mksglu/context-mode (GitHub) | 🟡 CONFIABLE | 2026-05 | Sandbox de outputs masivos (~98% reducción de tokens). Auditado: sin exfiltración, sin red, MCP local |
 
 ### Marketplaces configurados
 
 | Nombre | Fuente GitHub | Tipo |
 |---|---|---|
 | `claude-plugins-official` | `anthropics/claude-plugins-official` | Oficial Anthropic |
+| `context-mode` | `mksglu/context-mode` | Comunitario — auditado ✅ |
 
 ---
 
