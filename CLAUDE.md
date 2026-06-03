@@ -21,7 +21,12 @@
 
 ## 🏗️ ARQUITECTURA DE CAPAS
 
-Core (sesión principal) → Delegación (subagentes) → Extensión (Skills + Hooks + MCP). La exploración de código siempre va a subagentes; nunca en la sesión principal.
+Core (sesión principal) → Delegación (subagentes) → Extensión (Skills + Hooks + MCP).
+
+> 🔴 **OBLIGATORIO — no contaminar la sesión principal:**
+> - **Exploración multi-archivo** (diagnóstico, mapeo, buscar el origen de un error, `Glob`/`Grep` amplios cuyo resultado no se usa entero) → delegar a `@explorer`, que recorre en aislado y devuelve solo el veredicto.
+> - **Analizar archivos/outputs grandes** (filtrar, contar, resumir, extraer) → `context-mode` (`ctx_execute_file`), que corre en sandbox y solo imprime el resultado.
+> - **Excepción (ambos):** leer un archivo concreto para **editarlo** va con `Read` directo — `Edit` necesita los bytes exactos.
 
 ---
 
@@ -245,6 +250,7 @@ Claude Code NUNCA debe:
 - Encadenar comandos con `&&` cuando no hay dependencia real entre ellos — si son independientes, ejecutarlos en llamadas separadas
 - Modificar archivos en `~/.claude/` — son inmutables por agentes; solo el usuario los modifica
 - Releer archivos ya leídos en la misma sesión salvo que el archivo pueda haber cambiado — usar el resultado ya obtenido
+- Contaminar la sesión principal: exploración multi-archivo va a `@explorer`, análisis de archivos grandes va a `context-mode` (ver Arquitectura de capas)
 - En code reviews: identificar el problema, mostrar el fix, parar — sin sugerencias fuera del scope pedido
 - Generar boilerplate no solicitado (imports genéricos, docstrings vacíos, scaffolding) salvo petición explícita
 
