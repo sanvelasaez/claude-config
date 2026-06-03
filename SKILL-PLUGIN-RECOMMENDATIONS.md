@@ -60,6 +60,51 @@ El LLM consulta el grafo en lugar de leer archivos completos:
 
 ---
 
+### sonarqube — Análisis de calidad y seguridad de código
+
+| Campo | Valor |
+|---|---|
+| **Tipo** | Plugin (`claude-plugins-official`) |
+| **Scope** | Por proyecto — proyectos con CI/CD o metas de calidad |
+| **Instalar** | `claude plugin install sonarqube@claude-plugins-official` |
+| **Licencia** | Anthropic oficial ✅ |
+| **Auditoría** | ✅ VERIFICADA — 2026-05 |
+| **Comandos** | `/sonarqube:sonar-integrate`, `/sonarqube:sonar-analyze`, `/sonarqube:sonar-list-issues` |
+
+**Qué aporta:**
+Integración completa con SonarQube: cobertura de tests, detección de duplicaciones, análisis de dependencias (SCA), quality gate, issues de seguridad y code smells. Incluye hooks de análisis automático al escribir.
+
+**Cuándo sugerir — triggers:**
+- El proyecto tiene un servidor SonarQube configurado o usa SonarCloud
+- El usuario pregunta por cobertura de tests o code quality metrics
+- El proyecto tiene metas de quality gate en CI/CD
+- Se trabaja en proyectos enterprise o con requisitos de compliance
+- El usuario quiere auditar dependencias por CVEs (SCA)
+
+---
+
+### frontend-design — Interfaces frontend production-grade
+
+| Campo | Valor |
+|---|---|
+| **Tipo** | Plugin (`claude-plugins-official`) |
+| **Scope** | Por proyecto — proyectos con UI web |
+| **Instalar** | `claude plugin install frontend-design@claude-plugins-official` |
+| **Licencia** | Anthropic oficial ✅ |
+| **Auditoría** | ✅ VERIFICADA — 2026-05 |
+
+**Qué aporta:**
+Skill de implementación frontend con elecciones estéticas distintivas y opinionadas. Genera interfaces production-grade evitando la estética genérica de IA: tipografía cuidada, espaciado consistente, paleta de color coherente, componentes con estados completos.
+
+**Cuándo sugerir — triggers:**
+- El proyecto tiene una capa frontend web (React, Vue, Svelte, Astro…)
+- El usuario pide construir una página, componente o UI desde cero
+- Se está diseñando un sistema de diseño o componentes reutilizables
+- El usuario menciona que la UI "parece genérica" o quiere mejorar el aspecto visual
+- Proyectos SaaS, dashboards, landing pages o apps consumer-facing
+
+---
+
 ## Añadir una nueva recomendación
 
 Al identificar una herramienta candidata:

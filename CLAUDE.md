@@ -39,89 +39,6 @@ CAPA 3 — EXTENSIÓN (Skills + Hooks + MCP)
 
 ---
 
-## 🚀 BOOTSTRAP — Instalación en sistema nuevo
-
-### Primera instalación — un solo comando
-
-```bash
-npx github:sanvelasaez/claude-config
-```
-
-Descarga el repositorio desde GitHub vía npm, copia todos los archivos a `~/.claude/`
-y verifica que el hook funciona. **Solo requiere Node.js 18+**, que ya viene incluido con Claude Code.
-No es necesario clonar el repo ni instalar nada previamente.
-
-### Actualizaciones futuras (desde Claude Code)
-
-Una vez instalado, cualquier actualización se hace con un solo comando dentro de Claude Code:
-
-```
-/setup
-```
-
-O directamente desde la terminal:
-```bash
-npx --yes github:sanvelasaez/claude-config
-```
-
-Para verificar sin instalar (útil para diagnosticar):
-```bash
-npx github:sanvelasaez/claude-config -- --check
-```
-
----
-
-### Dependencias del sistema
-
-| Dependencia | Versión mínima | Requerida para | Cómo instalar |
-|---|---|---|---|
-| **Node.js** | 18+ | Instalador `npx`, hooks y MCP server | https://nodejs.org |
-| **npm** | viene con Node | `npx` y MCPs | viene con Node.js |
-| **Claude Code** | última | Todo | `npm install -g @anthropic-ai/claude-code` |
-| Git | cualquiera | Flujo `git-workflow.md` | https://git-scm.com |
-| **rtk** | 0.23.0+ | Compresión de outputs CLI (~80% menos tokens) | Instalado automáticamente por el instalador |
-
-> **Node.js es el único requisito.** Claude Code ya lo incluye, así que si Claude Code está instalado, todo está cubierto.
-> **rtk** se instala automáticamente junto con el resto de la configuración. El hook centinel lo detecta en PATH y reescribe comandos CLI para reducir tokens de output tras aprobarlos.
-
-### Después de la instalación
-
-El instalador lo configura todo automáticamente, incluido el MCP centinel en `~/.claude.json`.
-Solo queda verificar que funciona e iniciar Claude Code:
-
-```bash
-claude
-```
-
-**Activar flujos opcionales por proyecto** — en `.claude/CLAUDE.md` del proyecto:
-```
-@~/.claude/git-workflow.md          ← si el proyecto usa Git workflow
-@~/.claude/agent-coordination.md   ← si el proyecto usa múltiples agentes
-```
-
----
-
-### Qué hace el instalador exactamente
-
-```
-1. Verifica Node.js >= 18
-2. Verifica Claude Code en PATH (avisa si no está)
-3. Verifica Git (avisa si no está, no bloquea)
-4. Copia skills/, agents/, hooks/, mcps/ → ~/.claude/
-5. Copia CLAUDE.md, settings.json, SKILL-PLUGIN-REGISTRY.md, SKILL-PLUGIN-RECOMMENDATIONS.md → ~/.claude/
-6. Copia git-workflow.md, agent-coordination.md → ~/.claude/
-7. Configura centinel (hook en settings.json + MCP server)
-8. Instala rtk (macOS: brew; Linux/Windows: binario precompilado desde GitHub releases)
-9. Instala skills externas y plugins
-10. En Unix/Mac: hace ejecutable hooks/centinel_preflight.py
-11. Verifica el hook: comando seguro pasa, rm -rf / queda bloqueado, rtk detectado
-12. Muestra los pasos manuales restantes
-```
-
-> Si algún archivo ya existe, **no lo sobreescribe** (usa `--force` para actualizar).
-
----
-
 ## 🔗 ALINEACIÓN GLOBAL ↔ PROYECTO
 
 ### Regla fundamental
@@ -155,64 +72,11 @@ Los archivos como `git-workflow.md` son **inactivos por defecto**. Para activar 
 @~/.claude/git-workflow.md
 ```
 
-Esta sintaxis importa el archivo directamente en el contexto del proyecto. Claude lo leerá y aplicará sus instrucciones en esa sesión.
-
-Además, añadir los permisos necesarios en `.claude/settings.json` del proyecto (ver plantilla en `templates/project-settings.json`). Verificar que no colisionan con los `deny` del settings global.
+Además, añadir los permisos necesarios en `.claude/settings.json` del proyecto. Verificar que no colisionan con los `deny` del settings global.
 
 ---
 
-## 🎯 SKILLS — Configuración inicial y auto-invocación
-
-> ⚠️ **Estado inicial:** En una instalación nueva no hay skills configuradas.  
-> El primer paso al iniciar Claude Code en un entorno nuevo es configurar las skills.
-
-### Guía de instalación completa (ejecutar en instalación nueva)
-
-**Paso 0 — Instalar con npx**
-El instalador copia todo automáticamente (ver sección Bootstrap al inicio de este archivo):
-```bash
-npx github:sanvelasaez/claude-config
-```
-> Si algún archivo ya existe, no lo sobreescribe. Para actualizar: `npx --yes github:sanvelasaez/claude-config`
-
-**Paso 1 — Verificar las skills de prioridad máxima**
-Tras el bootstrap, confirmar que existen en `~/.claude/skills/`:
-- `centinel-auditor.md` — auditoría de fuentes externas (prioridad 1)
-- `centinel-update.md` — mantenimiento de IOCs y configuración (prioridad 2)
-- `skill-finder.md` — búsqueda de skills (prioridad 3)
-
-Estas tres deben existir antes de instalar o buscar cualquier otra cosa.
-
-**Paso 2 — Buscar skills externas adicionales (opcional)**
-Usar `skill-finder` para buscar en fuentes externas cuando se necesite una capacidad no cubierta:
-- Buscar en GitHub con `claude-code skills <término>`
-- Consultar la documentación oficial de Anthropic (docs.anthropic.com)
-- **Siempre pasar por `centinel-auditor` antes de instalar cualquier skill externa**
-
-**Paso 3 — Crear skills personalizadas si se necesitan**
-Generar archivos `.md` en `~/.claude/skills/` (globales) o `.claude/skills/` (solo para el proyecto).
-Formato obligatorio:
-```markdown
----
-name: nombre-de-la-skill
-description: Descripción precisa que activa el trigger automático. Incluir cuándo se usa.
----
-
-[Contenido de la skill: proceso, criterios, formato de salida...]
-```
-
-**Paso 4 — Registrar y documentar**
-- Añadir la skill nueva a la tabla de skills de este CLAUDE.md
-- Actualizar `~/.claude/SKILL-PLUGIN-REGISTRY.md` con origen y estado de seguridad
-- Si es externa: añadir el resultado de la auditoría al historial del registro
-
-**Paso 5 — Verificar la configuración**
-Iniciar una sesión de Claude Code y comprobar que:
-- Las skills se cargan (probar un contexto que debería activar el trigger)
-- Los hooks funcionan (hacer una escritura de prueba y verificar audit.log)
-- Los permisos son correctos (intentar una operación denegada para confirmar el bloqueo)
-
----
+## 🎯 SKILLS — Auto-invocación y estado actual
 
 ### Tabla de skills — estado actual
 
@@ -233,21 +97,8 @@ El estado de seguridad y origen de cada skill se mantiene en `SKILL-PLUGIN-REGIS
 | 10 | `perf-profiler` | Analizar rendimiento e identificar cuellos de botella cuando hay degradación observable | `@reviewer`, `@qa` |
 | 11 | `reflection` | Analizar el historial de la sesión para detectar errores, reglas no aplicadas y patrones a sistematizar | sesión principal |
 
-> Esta tabla es la fuente de verdad del estado de skills. Se actualiza al añadir o eliminar cualquier skill (ver regla de actualización automática).
+> Esta tabla es la fuente de verdad del estado de skills. Se actualiza al añadir o eliminar cualquier skill.
 > El origen, seguridad y fechas de cada skill se registran en `SKILL-PLUGIN-REGISTRY.md`.
-
----
-
-### Contenido de las skills
-
-> El contenido completo de cada skill está en su archivo correspondiente dentro de `skills/`.
-> Esos archivos son la **fuente de verdad** — no mantener copias inline aquí.
-
-- `skills/centinel-auditor/SKILL.md` — auditoría de elementos externos: 7 pasos, multi-fuente, supply chain
-- `skills/centinel-update/SKILL.md` — mantenimiento de IOCs, hooks y skills; checklist trimestral
-- `skills/find-skills/SKILL.md` — descubrimiento en skills.sh + GitHub + Anthropic docs, con centinel-auditor integrado (fusión de skill-finder + vercel-labs/find-skills)
-- `skills/security-code/SKILL.md`, `skills/test-writer/SKILL.md`, `skills/debug-tracer/SKILL.md`
-- `skills/arch-patterns/SKILL.md`, `skills/doc-writer/SKILL.md`, `skills/ui-design-review/SKILL.md`, `skills/perf-profiler/SKILL.md`, `skills/reflection/SKILL.md`
 
 ---
 
@@ -279,21 +130,7 @@ a que la pida explícitamente.
 
 ### 📋 Regla de actualización automática de CLAUDE.md
 
-> Cada vez que se instale, active o cree cualquier skill, MCP server, agente o herramienta, Claude actualiza este archivo **antes de finalizar la tarea**.
-
-```
-AL AÑADIR cualquier elemento nuevo:
-
-  1. Ejecutar centinel-auditor si es de origen externo
-  2. Instalar / crear el elemento
-  3. Actualizar los archivos correspondientes:
-     a. Skill nueva     → crear archivo en skills/ + añadir fila a la tabla de skills de este CLAUDE.md
-                          + registrar en SKILL-PLUGIN-REGISTRY.md con origen y estado de seguridad
-     b. MCP nuevo       → añadir fila a la sección MCP con su scope (global o proyecto)
-     c. Agente nuevo    → crear archivo en agents/ + añadir fila a la tabla de subagentes de este CLAUDE.md
-     d. Agente afectado → actualizar la lista de skills en su archivo agents/<nombre>.md
-  4. Confirmar al usuario los cambios realizados
-```
+> Cada vez que se instale, active o cree cualquier skill, MCP server, agente o herramienta, actualizar los registros correspondientes antes de finalizar la tarea.
 
 ---
 
@@ -315,25 +152,7 @@ Ubicación: `~/.claude/agents/` (globales) | `.claude/agents/` (por proyecto)
 | `@qa` | Validar que una feature terminada cumple funcionalmente los requisitos | `claude-sonnet-4-6` | test-writer, security-code, perf-profiler, centinel-auditor |
 | `@designer` | Diseño visual de interfaces, sistemas de diseño, revisión de accesibilidad | `claude-sonnet-4-6` | ui-design-review |
 
-### Monitor de subagentes (sesión con más de un agente activo)
-
-Cuando la sesión principal coordina más de un subagente simultáneamente, activar un monitor periódico al inicio de la sesión usando `CronCreate` o el skill `/loop`:
-
-- **Intervalo:** cada 5 minutos
-- **Qué comprobar:** que cada agente activo haya emitido output en los últimos 5 minutos
-- **Señal de agente colgado:** sin respuesta tras un mensaje directo pasados 2-3 minutos
-
-**Protocolo de recuperación básico** (cuando `agent-coordination.md` no está activo en el proyecto):
-1. Ejecutar `git status` y `git log --oneline -5` en la rama del agente para conocer el estado real
-2. Si sin commit → la tarea vuelve a Pendiente; si con commit parcial → anotar qué falta
-3. Lanzar agente de reemplazo con: descripción de la tarea + estado git + *"Retoma desde donde lo dejó el agente anterior"*
-4. El orquestador nunca ejecuta directamente el trabajo del agente caído
-
-**Límites de paralelismo y fallo:**
-- Máximo 3 subagentes en paralelo salvo instrucción explícita del usuario
-- En fallos: reportar qué falló + por qué + qué se intentó, luego parar — no continuar especulando
-
-> Si el proyecto tiene `agent-coordination.md` activo, el protocolo completo está allí.
+> Para monitor de sesión, protocolo de recuperación y límites de paralelismo: ver `agent-coordination.md`.
 
 ---
 
@@ -352,11 +171,9 @@ Se instalan con `claude plugin install <nombre>@<marketplace>` y aplican a scope
 | `skill-creator` | `claude-plugins-official` | Crear y mejorar skills con ciclo de evaluación iterativo (reemplaza skill homónima) | — |
 | `hookify` | `claude-plugins-official` | Crear hooks mediante lenguaje natural sin editar JSON; analiza conversaciones para detectar patrones | `/hookify`, `/hookify:list`, `/hookify:configure` |
 | `security-guidance` | `claude-plugins-official` | Hook PreToolUse que detecta patrones inseguros en código al escribir (eval, XSS, command injection) | — |
-| `frontend-design` | `claude-plugins-official` | Skill de implementación frontend: interfaces production-grade con elecciones estéticas distintivas (full-stack) | — |
 | `claude-md-management` | `claude-plugins-official` | Audita CLAUDE.md contra el codebase actual + captura learnings de sesión | `/revise-claude-md` |
 | `feature-dev` | `claude-plugins-official` | Flujo de 7 fases para desarrollo de features con 3 agentes (explorer, architect, reviewer) | `/feature-dev` |
 | `pr-review-toolkit` | `claude-plugins-official` | 6 agentes especializados: comentarios, tests, fallos silenciosos, tipos, calidad, simplificación | `/review-pr` |
-| `sonarqube` | `claude-plugins-official` | Análisis de calidad y seguridad: cobertura, duplicación, issues, quality gate, dependency risks | `/sonarqube:sonar-integrate`, `/sonarqube:sonar-analyze` |
 | `context-mode` | `context-mode` | Sandbox de outputs masivos: logs, Playwright, APIs (~98% reducción de tokens de output) | `/ctx_execute`, `/ctx_search`, `/ctx_fetch_and_index` |
 
 ### Marketplaces configurados
@@ -378,34 +195,9 @@ Se instalan con `claude plugin install <nombre>@<marketplace>` y aplican a scope
 
 ### MCP global (`~/.claude.json`)
 
-**centinel** es el único MCP global recomendado — proporciona enriquecimiento de seguridad a Claude:
-
-```json
-{
-  "mcpServers": {
-    "centinel": {
-      "command": "node",
-      "args": ["~/.claude/mcps/centinel-server.js"]
-    }
-  }
-}
-```
-
-> Solo requiere Node.js (sin dependencias adicionales). Solo consulta OSV.dev y GitHub Advisory (sin auth).
-> Herramientas disponibles: `scan_package`, `check_ioc`, `add_ioc`, `ioc_stats`.
-
-**Filesystem** puede añadirse si se trabaja en múltiples proyectos y se necesita acceso por MCP:
-```json
-{
-  "mcpServers": {
-    "centinel": { "command": "node", "args": ["~/.claude/mcps/centinel-server.js"] },
-    "filesystem": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/home/user/projects"]
-    }
-  }
-}
-```
+**centinel** es el único MCP global — proporciona enriquecimiento de seguridad a Claude.  
+Herramientas disponibles: `scan_package`, `check_ioc`, `add_ioc`, `ioc_stats`.  
+Solo consulta OSV.dev y GitHub Advisory (sin auth, sin dependencias adicionales).
 
 ### MCP por proyecto (`.mcp.json` en la raíz del repo)
 
@@ -418,19 +210,6 @@ El resto de integraciones se configuran por proyecto, solo cuando se necesiten y
 | `@modelcontextprotocol/server-brave-search` | Cuando se necesite búsqueda web en el flujo |
 | MCP de gestión de tareas (Linear, Jira…) | Proyectos con tracker de tareas integrado |
 
-Plantilla para `.mcp.json` de proyecto:
-```json
-{
-  "mcpServers": {
-    "github": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github"],
-      "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}" }
-    }
-  }
-}
-```
-
 ---
 
 ## ⚡ HOOKS — Automatismos garantizados
@@ -441,33 +220,11 @@ Son la única capa completamente determinista de Claude Code.
 ### Hooks globales esenciales (`~/.claude/settings.json`)
 
 Solo hooks universales: bloqueo de comandos destructivos y auditoría de escrituras.
-El archivo `settings.json` de este repositorio contiene la configuración completa lista para copiar.
-
-Mejoras respecto a versiones anteriores:
-- **Bloqueo destructivo**: usa un script Python multilínea más legible y robusto (no un one-liner)
-- **Auditoría de escrituras**: registra solo la ruta del archivo escrito, no el contenido (evita logs voluminosos)
-- **Logs de sesión**: usa Python para compatibilidad cross-platform (Windows/Linux/macOS)
-- **Todos los scripts**: capturan excepciones silenciosamente para no interrumpir el flujo si el log falla
-
 Ver contenido completo en `settings.json` de este repositorio.
 
 ### Hooks de proyecto (definir en `/init`)
 
-Al inicializar un proyecto, crear en `.claude/settings.json` los hooks apropiados al stack:
-
-```
-Preguntar al usuario durante /init:
-  1. ¿Qué lenguajes usa el proyecto?
-     → Añadir hook PostToolUse con lint/format/typecheck para cada uno
-  2. ¿Tiene linter o formatter configurado?
-     → Integrar su comando en el hook de escritura
-  3. ¿Hay archivos o rutas que nunca se deben modificar?
-     → Añadir hook PreToolUse de bloqueo específico
-  4. ¿Tiene sistema de tests automatizados?
-     → Valorar hook PostToolUse para ejecutar tests afectados tras cada cambio
-
-Los hooks de proyecto van en .claude/settings.json, nunca en el global.
-```
+Al inicializar un proyecto, usar `/hookify:configure` para crear los hooks apropiados al stack mediante lenguaje natural. Los hooks de proyecto van en `.claude/settings.json`, nunca en el global.
 
 ---
 
@@ -593,65 +350,6 @@ Aplicar antes de considerar cualquier implementación terminada:
 - [ ] `@reviewer` ha validado los cambios
 - [ ] `@qa` ha confirmado que cumple funcionalmente con los requisitos
 - [ ] Si se añadieron dependencias externas: `centinel-auditor` las ha auditado
-
----
-
-## 📁 ESTRUCTURA DE DIRECTORIOS DE REFERENCIA
-
-```
-~/.claude/
-├── CLAUDE.md                          ← Este archivo
-├── settings.json                      ← Permisos y hooks globales
-├── SKILL-PLUGIN-REGISTRY.md          ← Registro de skills: origen, seguridad, historial
-├── SKILL-PLUGIN-RECOMMENDATIONS.md   ← Herramientas auditadas por tipo de proyecto (triggers de sugerencia)
-├── sessions.log                       ← Generado por hook (SessionStart/End)
-├── audit.log                          ← Generado por hook (PostToolUse Write — ruta del archivo)
-├── skills/
-│   ├── centinel-auditor/
-│   │   └── SKILL.md                   ← Prioridad 1 (auditoría de elementos externos)
-│   ├── find-skills/
-│   │   └── SKILL.md                   ← Prioridad 2 (descubrimiento de skills — fusión skill-finder + vercel-labs)
-│   ├── centinel-update/
-│   │   └── SKILL.md                   ← Prioridad 3 (mantenimiento de seguridad)
-│   ├── security-code/SKILL.md
-│   ├── test-writer/SKILL.md
-│   ├── debug-tracer/SKILL.md
-│   ├── arch-patterns/SKILL.md
-│   ├── doc-writer/SKILL.md
-│   ├── ui-design-review/SKILL.md
-│   ├── perf-profiler/SKILL.md
-│   └── reflection/SKILL.md
-├── hooks/
-│   ├── centinel_preflight.js          ← Hook de bloqueo en tiempo real (Node.js, sin deps)
-│   └── centinel_iocs.json             ← Base de IOCs — actualizar con centinel-update
-├── mcps/
-│   └── centinel-server.js             ← MCP server de enriquecimiento (Node.js, sin deps)
-├── agents/
-│   ├── explorer.md
-│   ├── architect.md
-│   ├── reviewer.md
-│   ├── debugger.md
-│   ├── qa.md
-│   └── designer.md
-├── commands/
-│   └── setup.md                       ← Slash command /setup — actualiza la config desde GitHub
-├── git-workflow.md                    ← Flujo Git opcional — activar por proyecto
-└── agent-coordination.md              ← Coordinación multi-agente opcional — activar por proyecto
-
-[En este repositorio — instalador y plantillas]
-package.json                           ← Descriptor npm (habilita npx github:sanvelasaez/claude-config)
-bin/install.js                         ← Instalador Node.js — copia archivos a ~/.claude/ y verifica el hook
-README.md                              ← Documentación e instrucciones de instalación
-templates/
-├── project-claude.md                  ← Copiar a .claude/CLAUDE.md del proyecto y rellenar
-└── project-settings.json              ← Copiar a .claude/settings.json del proyecto y ajustar
-
-[Raíz de cada proyecto]
-└── .claude/
-    ├── CLAUDE.md                      ← Contexto del proyecto (extendido de la plantilla)
-    ├── settings.json                  ← Permisos y hooks del proyecto
-    └── .mcp.json                      ← MCP servers del proyecto (si aplica)
-```
 
 ---
 

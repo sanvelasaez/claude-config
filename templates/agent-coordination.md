@@ -5,6 +5,20 @@
 
 ---
 
+## 👁️ Monitor de agentes activos
+
+Cuando la sesión principal coordina al menos un subagente, activar un monitor periódico al inicio de la sesión usando `CronCreate` o el skill `/loop`:
+
+- **Intervalo:** cada 5 minutos
+- **Qué comprobar:** que cada agente activo haya emitido output en los últimos 5 minutos
+- **Señal de agente colgado:** sin respuesta tras un mensaje directo pasados 2-3 minutos
+
+**Límites de paralelismo y fallo:**
+- Máximo 3 subagentes en paralelo salvo instrucción explícita del usuario
+- En fallos: reportar qué falló + por qué + qué se intentó, luego parar — no continuar especulando
+
+---
+
 ## ⚙️ Cómo activar en un proyecto
 
 **Paso 1 — Importar el archivo en el CLAUDE.md del proyecto**
