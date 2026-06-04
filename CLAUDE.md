@@ -72,6 +72,7 @@ Además, añadir los permisos necesarios en `.claude/settings.json` del proyecto
 | 9 | `ui-design-review` | Revisar contraste, tipografía, espaciado, estados de componente y accesibilidad en interfaces frontend | `@designer` |
 | 10 | `perf-profiler` | Analizar rendimiento e identificar cuellos de botella cuando hay degradación observable | `@reviewer`, `@qa` |
 | 11 | `reflection` | Analizar el historial de la sesión para detectar errores, reglas no aplicadas y patrones a sistematizar | sesión principal |
+| 12 | `caveman-compressor` | Comprimir respuestas 30-85% manteniendo precisión técnica. Modes: lite (35%), full (60-75%), ultra (57-75%). Activar: `/caveman` | sesión principal |
 
 ---
 
