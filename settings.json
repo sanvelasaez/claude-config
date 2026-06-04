@@ -1,7 +1,8 @@
 {
   "_descripcion": "Configuración global de Claude Code. Copiar a ~/.claude/settings.json en cada instalación nueva.",
   "language": "Español",
-  "skillListingBudgetFraction": 0.02,
+  "skillListingBudgetFraction": 0.01,
+  "model": "haiku",
   "permissions": {
     "deny": [
       "Read(**/.env)",
@@ -34,14 +35,21 @@
       "mcp__centinel__scan_package",
       "mcp__centinel__add_ioc",
       "mcp__centinel__ioc_stats",
+      "mcp__plugin_context-mode_context-mode__ctx_execute_file",
+      "mcp__plugin_context-mode_context-mode__ctx_execute",
+      "mcp__plugin_context-mode_context-mode__ctx_stats",
+      "mcp__plugin_context-mode_context-mode__ctx_batch_execute",
+      "mcp__plugin_context-mode_context-mode__ctx_fetch_and_index",
+      "mcp__plugin_context-mode_context-mode__ctx_search",
 
+      "Bash(rtk *)",
       "Bash(npm install*)",
       "Bash(npm run*)",
       "Bash(npx *)",
       "Bash(npx skills *)",
       "Bash(node *)",
       "Bash(python3 *)",
-      "Bash(python3 -c *",
+      "Bash(python3 -c *)",
       "Bash(python *)",
       "Bash(pip install*)",
       "Bash(pip3 install*)",
@@ -73,6 +81,7 @@
       "Bash(Select-Object Name)",
       "Bash(Sort-Object Name)",
 
+      "PowerShell(rtk *)",
       "PowerShell(npm *)",
       "PowerShell(node *)",
       "PowerShell(python3 *)",
@@ -95,6 +104,7 @@
       "PowerShell(git status)",
       "PowerShell(git diff*)",
       "PowerShell(git log*)",
+      "PowerShell(Get-Command *)",
 
       "WebSearch",
       "Bash(winget *)",
@@ -109,6 +119,27 @@
     ]
   },
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"C:/Program Files/nodejs/node.exe\" \"C:/Users/santi/.claude/hooks/context-mode-cache-heal.mjs\""
+          }
+        ]
+      }
+    ],
+    // "PreToolUse": [
+    //   {
+    //     "matcher": "Bash",
+    //     "hooks": [
+    //       {
+    //         "type": "command",
+    //         "command": "rtk hook claude"
+    //       }
+    //     ]
+    //   }
+    // ],
     "PreToolUse": [
       {
         "matcher": "Bash",
@@ -164,6 +195,33 @@
           }
         ]
       }
-    ]
+    ],
+    "enabledPlugins": {
+      "context-mode@context-mode": true,
+      "skill-creator@claude-plugins-official": true,
+      "claude-md-management@claude-plugins-official": true,
+      "security-guidance@claude-plugins-official": true,
+      "caveman@caveman": true
+    },
+    "extraKnownMarketplaces": {
+      "claude-plugins-official": {
+        "source": {
+          "source": "github",
+          "repo": "anthropics/claude-plugins-official"
+        }
+      },
+      "context-mode": {
+        "source": {
+          "source": "github",
+          "repo": "mksglu/context-mode"
+        }
+      },
+      "caveman": {
+        "source": {
+          "source": "github",
+          "repo": "JuliusBrussee/caveman"
+        }
+      }
+    }
   }
 }
