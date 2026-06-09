@@ -3,18 +3,17 @@ setlocal enabledelayedexpansion
 
 set "NPM_DIR=%APPDATA%\npm"
 set "RTK_PATH=%NPM_DIR%\rtk.exe"
-set "VERSION=0.42.0"
-set "URL=https://github.com/reachingforthejack/rtk/releases/download/v%VERSION%/rtk-x86_64-pc-windows-msvc.exe"
-set "TEMP_FILE=%TEMP%\rtk-installer.exe"
+set "VERSION=dev-0.43.0-rc.271"
+set "URL=https://github.com/rtk-ai/rtk/releases/download/%VERSION%/rtk-x86_64-pc-windows-msvc.zip"
+set "TEMP_ZIP=%TEMP%\rtk-installer.zip"
+set "TEMP_DIR=%TEMP%\rtk-extract"
 
 echo === RTK Installer ===
 echo.
 
-REM Check if installed
+REM Remove old version if exists
 if exist "%RTK_PATH%" (
-    echo [OK] RTK already installed
-    "%RTK_PATH%" --version
-    exit /b 0
+    del "%RTK_PATH%" >nul 2>&1
 )
 
 REM Create directory
@@ -23,30 +22,49 @@ if not exist "%NPM_DIR%" (
     mkdir "%NPM_DIR%"
 )
 
-REM Download using curl (native in Windows 10+)
-echo [*] Downloading RTK v%VERSION%...
-curl -L -o "%TEMP_FILE%" "%URL%" 2>/dev/null
+REM Download ZIP
+echo [*] Downloading RTK %VERSION%...
+curl -L -o "%TEMP_ZIP%" "%URL%"
 
-if not exist "%TEMP_FILE%" (
+if not exist "%TEMP_ZIP%" (
     echo [ERROR] Download failed - check internet connection
     exit /b 1
 )
 echo [OK] Downloaded
 
-REM Install
-echo [*] Installing...
-copy "%TEMP_FILE%" "%RTK_PATH%" >/dev/null 2>&1
+REM Extract ZIP
+echo [*] Extracting...
+if exist "%TEMP_DIR%" (
+    rmdir /s /q "%TEMP_DIR%" >nul 2>&1
+)
+mkdir "%TEMP_DIR%"
+powershell -Command "Expand-Archive -Path '%TEMP_ZIP%' -DestinationPath '%TEMP_DIR%' -Force" >nul 2>&1
 if !errorlevel! neq 0 (
-    echo [ERROR] Installation failed
-    del "%TEMP_FILE%" >/dev/null 2>&1
+    echo [ERROR] Extraction failed
+    del "%TEMP_ZIP%" >nul 2>&1
+    rmdir /s /q "%TEMP_DIR%" >nul 2>&1
     exit /b 1
 )
-del "%TEMP_FILE%" >/dev/null 2>&1
+echo [OK] Extracted
+
+REM Install
+echo [*] Installing...
+copy /y "%TEMP_DIR%\rtk.exe" "%RTK_PATH%" >nul 2>&1
+if !errorlevel! neq 0 (
+    echo [ERROR] Installation failed
+    del "%TEMP_ZIP%" >nul 2>&1
+    rmdir /s /q "%TEMP_DIR%" >nul 2>&1
+    exit /b 1
+)
 echo [OK] Installed
+
+REM Cleanup
+del "%TEMP_ZIP%" >nul 2>&1
+rmdir /s /q "%TEMP_DIR%" >nul 2>&1
 
 REM Verify
 echo [*] Verifying...
-"%RTK_PATH%" --version >/dev/null 2>&1
+"%RTK_PATH%" --version >nul 2>&1
 if !errorlevel! neq 0 (
     echo [ERROR] Verification failed
     exit /b 1
@@ -59,11 +77,11 @@ echo [*] Adding to PATH...
 for /f "tokens=2*" %%a in ('reg query HKCU\Environment /v PATH 2^>nul') do set "OLD_PATH=%%b"
 
 if "!OLD_PATH!"=="" (
-    setx PATH "%NPM_DIR%" >/dev/null 2>&1
+    setx PATH "%NPM_DIR%" >nul 2>&1
 ) else (
-    echo !OLD_PATH! | findstr /i "%NPM_DIR%" >/dev/null 2>&1
+    echo !OLD_PATH! | findstr /i "%NPM_DIR%" >nul 2>&1
     if !errorlevel! neq 0 (
-        setx PATH "!OLD_PATH!;%NPM_DIR%" >/dev/null 2>&1
+        setx PATH "!OLD_PATH!;%NPM_DIR%" >nul 2>&1
     )
 )
 echo [OK] PATH updated
